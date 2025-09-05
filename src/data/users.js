@@ -20,7 +20,7 @@ export default [
     name: "Priya Singh",
     phone: "9988776655",
     email: "psingh@gmail.com",
-    company: "HelioWeb",
+    company: "KasperTech",
     role: "Frontend Developer",
   },
   {
@@ -52,7 +52,7 @@ export default [
     name: "Sanya Malhotra",
     phone: "9765432109",
     email: "sanya.m@gmail.com",
-    company: "HelioWeb",
+    company: "KasperTech",
     role: "DevOps Engineer",
   },
   {
@@ -84,7 +84,7 @@ export default [
     name: "Arjun Gupta",
     phone: "9321098765",
     email: "arjun.g@gmail.com",
-    company: "HelioWeb",
+    company: "KasperTech",
     role: "UI/UX Designer",
   },
   {
@@ -116,7 +116,7 @@ export default [
     name: "Rahul Desai",
     phone: "8987654321",
     email: "rahul.d@gmail.com",
-    company: "HelioWeb",
+    company: "KasperTech",
     role: "Full Stack Developer",
   },
   {
@@ -148,7 +148,7 @@ export default [
     name: "Rakesh Patel",
     phone: "6543210987",
     email: "rakesh.p@gmail.com",
-    company: "HelioWeb",
+    company: "KasperTech",
     role: "Backend Developer",
   },
   {
@@ -180,7 +180,7 @@ export default [
     name: "Pooja Nair",
     phone: "2109876543",
     email: "pooja.n@gmail.com",
-    company: "HelioWeb",
+    company: "KasperTech",
     role: "DevOps Engineer",
   },
   {
@@ -212,7 +212,7 @@ export default [
     name: "Simran Kaur",
     phone: "7065432109",
     email: "simran.k@gmail.com",
-    company: "HelioWeb",
+    company: "KasperTech",
     role: "UI/UX Designer",
   },
   {

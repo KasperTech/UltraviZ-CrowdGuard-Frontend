@@ -24,9 +24,9 @@ import brand from "../../../data/brand";
 
 // Meta data
 const meta = {
-  title: "Cameras | HelioWeb Admin",
+  title: "Cameras | KasperTech Admin",
   description: "Manage and monitor all camera devices in your system",
-  keywords: "HelioWeb, Admin, Cameras, Monitoring, Devices",
+  keywords: "KasperTech, Admin, Cameras, Monitoring, Devices",
   robots: "index, follow",
 };
 
