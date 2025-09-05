@@ -1,17 +1,17 @@
 import { Box, CircularProgress } from "@mui/material";
 
-const Loader = () => {
+const Loader = ({height, width}) => {
   return (
     <Box
       sx={{
-        height: "100vh",
-        width: "100%",
+        height: height || "100vh",
+        width: width || "100%",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
       }}
     >
-      <CircularProgress size="4rem" />
+      <CircularProgress size="2rem" />
     </Box>
   );
 };

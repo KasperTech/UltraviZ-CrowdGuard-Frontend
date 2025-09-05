@@ -14,13 +14,11 @@ import {
   TableSortLabel,
   Typography,
   Box,
-  IconButton,
-  Tooltip,
-  Divider,
   CircularProgress,
-  Menu,
-  MenuItem,
+  Collapse,
+  IconButton,
 } from "@mui/material";
+import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 import PropTypes from "prop-types";
 import { useTheme } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
@@ -35,21 +33,27 @@ const ResponsiveTable = ({
   data,
   columns,
   renderCard,
+  cardVariant,
   selectable = false,
   multiSelect = false,
   onSelect = () => {},
   sortConfig = {},
   bulkActions = [],
   showActions = true,
-  showMoreActions = true,
+  expandable = false,
+  subTableProps = {},
+  onRowExpand,
+  rowStyle = () => ({}),
+  disabled = false,
+  showPagination = true,
 }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const [selectedRows, setSelectedRows] = useState([]);
   const [sortBy, setSortBy] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [selectedRow, setSelectedRow] = React.useState(null);
+  const [expandedRows, setExpandedRows] = useState({});
+  const [expandedData, setExpandedData] = useState({});
 
   // Handle Pagination
   const handleChangePage = (event, newPage) => setPage(newPage);
@@ -65,26 +69,38 @@ const ResponsiveTable = ({
     setSortBy(column);
   };
 
-  // Handle Selection
+  // Handle Row Selection
   const handleRowSelect = (row) => {
+    if (disabled) return;
     if (multiSelect) {
-      const newSelection = selectedRows.includes(row)
+      const isSelected = selectedRows.includes(row);
+      const newSelectedRows = isSelected
         ? selectedRows.filter((selected) => selected !== row)
         : [...selectedRows, row];
-      setSelectedRows(newSelection);
-      onSelect(newSelection);
+      setSelectedRows(newSelectedRows);
+      onSelect(newSelectedRows.map((r) => r.deviceId));
     } else {
-      setSelectedRows([row]);
-      onSelect([row]);
+      const newSelectedRow = [row];
+      setSelectedRows(newSelectedRow);
+      onSelect(newSelectedRow.map((r) => r.deviceId));
     }
   };
 
-  // "Select All" Checkbox
-  const handleSelectAll = () => {
-    const allSelected = selectedRows.length === paginatedData.length;
-    const newSelection = allSelected ? [] : [...paginatedData];
-    setSelectedRows(newSelection);
-    onSelect(newSelection);
+  // Handle Row Expansion
+  const handleRowExpansion = async (rowId, rowData) => {
+    if (disabled) return;
+    setExpandedRows((prev) => ({
+      ...prev,
+      [rowId]: !prev[rowId],
+    }));
+
+    if (!expandedRows[rowId] && onRowExpand) {
+      const fetchedData = await onRowExpand(rowData);
+      setExpandedData((prev) => ({
+        ...prev,
+        [rowId]: fetchedData,
+      }));
+    }
   };
 
   const getSortedData = () => {
@@ -96,16 +112,16 @@ const ResponsiveTable = ({
       return compareFn(a[sortBy], b[sortBy]) * orderMultiplier;
     });
   };
+
   const sortedData = getSortedData();
-  const paginatedData = sortedData;
+  const hasActions = data.some((row) => row.actions && row.actions.length > 0);
 
   return (
     <Fragment>
-      {/* Bulk Actions */}
-      {selectedRows.length > 0 && (
+      {selectedRows?.length > 0 && (
         <Box mb={2} mx={4} display="flex" justifyContent="space-between">
           <Typography variant="subtitle1">
-            {selectedRows.length} selected
+            {selectedRows?.length} selected
           </Typography>
           <Box>
             {bulkActions.map((action, index) => (
@@ -113,8 +129,11 @@ const ResponsiveTable = ({
                 key={index}
                 variant="contained"
                 color={action.color || "primary"}
-                onClick={() => action.onClick(selectedRows)}
+                onClick={() =>
+                  action.onClick(selectedRows.map((r) => r.deviceId))
+                }
                 sx={{ margin: 0.5 }}
+                disabled={action.disabled || disabled}
               >
                 {action.label}
               </Button>
@@ -124,43 +143,62 @@ const ResponsiveTable = ({
       )}
 
       {isSmallScreen ? (
-        paginatedData.map((row, index) => (
-          <Card key={index} sx={{ margin: 2 }}>
-            <CardContent>{renderCard(row)}</CardContent>
+        sortedData.map((row, index) => (
+          <Card key={index} sx={{ margin: 1 }} variant={cardVariant}>
+            {loading ? (
+              <TableBody>
+                <TableRow>
+                  <TableCell colSpan={columns.length + 3}>
+                    <Box display="flex" justifyContent="center">
+                      <CircularProgress />
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            ) : (
+              <CardContent>{renderCard(row)}</CardContent>
+            )}
           </Card>
         ))
       ) : (
         <TableContainer>
-          <Divider />
           <Table>
             <TableHead sx={{ background: "#f8f8f8" }}>
               <TableRow>
+                {expandable && <TableCell />}
                 {selectable && (
                   <TableCell>
                     <Checkbox
                       indeterminate={
-                        selectedRows.length > 0 &&
-                        selectedRows.length < paginatedData.length
+                        selectedRows?.length > 0 &&
+                        selectedRows?.length < data?.length
                       }
                       checked={
-                        selectedRows.length > 0 &&
-                        selectedRows.length === paginatedData.length
+                        selectedRows?.length > 0 &&
+                        selectedRows?.length === data?.length
                       }
-                      onChange={handleSelectAll}
+                      onChange={(e) => {
+                        if (disabled) return;
+                        if (e.target.checked) {
+                          setSelectedRows(data);
+                          onSelect(data.map((r) => r.deviceId));
+                        } else {
+                          setSelectedRows([]);
+                          onSelect([]);
+                        }
+                      }}
+                      disabled={disabled}
                     />
                   </TableCell>
                 )}
                 {columns.map((column, index) => (
-                  <TableCell
-                    key={index}
-                    sx={{ fontWeight: 600, fontSize: "1rem" }}
-                    style={index === 0 ? { paddingLeft: "48px" } : {}}
-                  >
+                  <TableCell key={index}>
                     {column.sortable ? (
                       <TableSortLabel
                         active={sortBy === column.key}
                         direction={sortOrder}
                         onClick={() => handleSort(column.key)}
+                        disabled={disabled}
                       >
                         {column.label}
                       </TableSortLabel>
@@ -169,33 +207,14 @@ const ResponsiveTable = ({
                     )}
                   </TableCell>
                 ))}
-                {showActions && (
-                  <TableCell sx={{ fontWeight: 600, fontSize: "1rem" }}>
-                    Actions
-                  </TableCell>
-                )}
+                {showActions && hasActions && <TableCell>Actions</TableCell>}
               </TableRow>
             </TableHead>
             {loading ? (
               <TableBody>
                 <TableRow>
-                  <TableCell
-                    rowSpan={5}
-                    colSpan={
-                      selectable ? columns.length + 2 : columns.length + 1
-                    }
-                    sx={{
-                      p: 0,
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        height: 400,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
+                  <TableCell colSpan={columns.length + 3}>
+                    <Box display="flex" justifyContent="center">
                       <CircularProgress />
                     </Box>
                   </TableCell>
@@ -203,106 +222,98 @@ const ResponsiveTable = ({
               </TableBody>
             ) : (
               <TableBody>
-                {paginatedData.length > 0 ? (
-                  paginatedData.map((row, rowIndex) => (
-                    <TableRow key={rowIndex}>
-                      {selectable && (
-                        <TableCell>
-                          <Checkbox
-                            checked={selectedRows.includes(row)}
-                            onChange={() => handleRowSelect(row)}
-                          />
-                        </TableCell>
-                      )}
-                      {columns.map((column, colIndex) => (
-                        <TableCell
-                          key={colIndex}
-                          style={colIndex === 0 ? { paddingLeft: "48px" } : {}}
-                        >
-                          {column.render
-                            ? column.render(row)
-                            : row[column.key] || ""}
-                        </TableCell>
-                      ))}
-                      {showActions && (
-                        <TableCell sx={{ display: "flex" }}>
-                          {row.actions.map((action, actionIndex) => (
-                            <Box key={actionIndex}>
-                              {action.label ? (
+                {sortedData?.length > 0 ? (
+                  sortedData.map((row, index) => (
+                    <Fragment key={index}>
+                      <TableRow
+                        style={{
+                          ...rowStyle(row),
+                          ...(disabled && {
+                            opacity: 0.5,
+                            pointerEvents: "none",
+                          }),
+                        }}
+                      >
+                        {expandable && (
+                          <TableCell>
+                            <IconButton
+                              onClick={() => handleRowExpansion(index, row)}
+                              size="small"
+                              disabled={disabled}
+                            >
+                              {expandedRows[index] ? (
+                                <KeyboardArrowUp />
+                              ) : (
+                                <KeyboardArrowDown />
+                              )}
+                            </IconButton>
+                          </TableCell>
+                        )}
+                        {selectable && (
+                          <TableCell>
+                            <Checkbox
+                              checked={selectedRows.includes(row)}
+                              onChange={() => handleRowSelect(row)}
+                              disabled={disabled}
+                            />
+                          </TableCell>
+                        )}
+                        {columns.map((column, colIndex) => (
+                          <TableCell key={colIndex}>
+                            {column.render
+                              ? column.render(row)
+                              : row[column.key] === 0
+                              ? "0"
+                              : row[column.key] || ""}
+                          </TableCell>
+                        ))}
+                        {showActions &&
+                          hasActions &&
+                          row.actions?.length > 0 && (
+                            <TableCell
+                              sx={{
+                                display: "flex",
+                                justifyContent: "flex-evenly",
+                              }}
+                            >
+                              {row.actions.map((action, actionIndex) => (
                                 <Button
+                                  key={actionIndex}
+                                  onClick={action.onClick}
                                   variant="contained"
                                   color={action.color || "primary"}
-                                  onClick={action.onClick}
-                                  sx={{ margin: 0.5 }}
-                                  startIcon={action.icon && action.icon}
+                                  sx={{ marginRight: 1 }}
+                                  disabled={action.disabled || disabled}
                                 >
                                   {action.label}
                                 </Button>
-                              ) : (
-                                <>
-                                  {showMoreActions && (
-                                    <Tooltip title="More" placement="right">
-                                      <IconButton
-                                        onClick={(e) => {
-                                          setAnchorEl(e.currentTarget);
-                                          setSelectedRow(row);
-                                        }}
-                                      >
-                                        {action.icon}
-                                      </IconButton>
-                                    </Tooltip>
-                                  )}
-                                  {/* More Actions */}
-                                  <Menu
-                                    anchorEl={anchorEl}
-                                    anchorOrigin={{
-                                      vertical: "bottom",
-                                      horizontal: "right",
-                                    }}
-                                    keepMounted
-                                    transformOrigin={{
-                                      vertical: "center",
-                                      horizontal: "left",
-                                    }}
-                                    open={Boolean(anchorEl)}
-                                    onClose={() => setAnchorEl(null)}
-                                  >
-                                    <MenuItem disabled>More Actions</MenuItem>
-                                    {action.moreActions.map((item, i) => (
-                                      <MenuItem
-                                        key={i}
-                                        onClick={() => {
-                                          item.onClick(selectedRow);
-                                          setAnchorEl(null);
-                                        }}
-                                        sx={{
-                                          background: item.color && item.color,
-                                          m: 1,
-                                          borderRadius: 2,
-                                          boxShadow: 8,
-                                          fontWeight: 600,
-                                          "&:hover": {
-                                            opacity: 0.8,
-                                            background:
-                                              item.color && item.color,
-                                          },
-                                        }}
-                                      >
-                                        {item.label}
-                                      </MenuItem>
-                                    ))}
-                                  </Menu>
-                                </>
-                              )}
-                            </Box>
-                          ))}
-                        </TableCell>
+                              ))}
+                            </TableCell>
+                          )}
+                      </TableRow>
+                      {expandable && (
+                        <TableRow>
+                          <TableCell colSpan={columns.length + 3}>
+                            <Collapse
+                              in={expandedRows[index]}
+                              timeout="auto"
+                              unmountOnExit
+                            >
+                              <Box margin={2}>
+                                <ResponsiveTable
+                                  {...subTableProps}
+                                  data={expandedData[index] || []}
+                                />
+                              </Box>
+                            </Collapse>
+                          </TableCell>
+                        </TableRow>
                       )}
-                    </TableRow>
+                    </Fragment>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={columns.length + 1} align="center">
+                    <TableCell colSpan={columns.length + 3} align="center">
                       No data available
                     </TableCell>
                   </TableRow>
@@ -312,49 +323,44 @@ const ResponsiveTable = ({
           </Table>
         </TableContainer>
       )}
-      <TablePagination
-        component="div"
-        count={metaData?.count || data.length}
-        page={page}
-        onPageChange={handleChangePage}
-        rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-        rowsPerPageOptions={[5, 10, 25]}
-      />
+
+      {showPagination && (
+        <TablePagination
+          component="div"
+          count={metaData?.total_results || data.length}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          rowsPerPageOptions={[5, 10, 25]}
+          disabled={disabled}
+        />
+      )}
     </Fragment>
   );
 };
 
-// Define prop types for the enhanced component
 ResponsiveTable.propTypes = {
+  page: PropTypes.number.isRequired,
+  setPage: PropTypes.func.isRequired,
+  rowsPerPage: PropTypes.number.isRequired,
+  setRowsPerPage: PropTypes.func.isRequired,
+  metaData: PropTypes.object,
+  loading: PropTypes.bool,
   data: PropTypes.array.isRequired,
-  columns: PropTypes.arrayOf(
-    PropTypes.shape({
-      label: PropTypes.string.isRequired,
-      key: PropTypes.string.isRequired,
-      render: PropTypes.func,
-      sortable: PropTypes.bool,
-    })
-  ).isRequired,
-  renderCard: PropTypes.func.isRequired,
+  columns: PropTypes.array.isRequired,
+  renderCard: PropTypes.func,
   selectable: PropTypes.bool,
   multiSelect: PropTypes.bool,
   onSelect: PropTypes.func,
-  sortConfig: PropTypes.objectOf(PropTypes.func),
-  filters: PropTypes.object,
-  bulkActions: PropTypes.arrayOf(
-    PropTypes.shape({
-      label: PropTypes.string.isRequired,
-      onClick: PropTypes.func.isRequired,
-      color: PropTypes.string,
-    })
-  ),
-  searchFields: PropTypes.arrayOf(
-    PropTypes.shape({
-      label: PropTypes.string.isRequired,
-      key: PropTypes.string.isRequired,
-    })
-  ),
+  sortConfig: PropTypes.object,
+  bulkActions: PropTypes.array,
+  showActions: PropTypes.bool,
+  expandable: PropTypes.bool,
+  subTableProps: PropTypes.object,
+  onRowExpand: PropTypes.func,
+  rowStyle: PropTypes.func,
+  disabled: PropTypes.bool,
 };
 
 export default ResponsiveTable;

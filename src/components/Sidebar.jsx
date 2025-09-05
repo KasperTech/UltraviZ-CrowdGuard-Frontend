@@ -17,7 +17,7 @@ import brand from "../data/brand";
 import { useLocation, Link } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
-import { adminRoutes, demoRoutes } from "../routes";
+import { adminRoutes, demoRoutes, userRoutes, cameraRoutes, entranceRoutes } from "../routes";
 import { hexToRgb } from "../utils/helpers";
 
 /************************************************** 
@@ -28,59 +28,70 @@ const sidebarData = [
     section: "Main",
     items: [
       {
-        title: "Starter",
+        title: "Dasboard",
         url: adminRoutes.starter,
         icon: <Icon icon="ic:round-dashboard" width="1.5em" height="1.5em" />,
       },
-    ],
-  },
-  {
-    section: "Demo",
-    items: [
       {
-        title: "Dashboard",
-        url: adminRoutes.root,
-        icon: <Icon icon="ic:round-dashboard" width="1.5em" height="1.5em" />,
-      },
-      {
-        title: "Forms",
-        icon: (
-          <Icon
-            icon="fluent:form-24-regular"
-            width="1.8em"
-            height="1.8em"
-            style={{ marginLeft: -5 }}
-          />
-        ),
-        subItems: [
-          {
-            title: "Fields",
-            url: demoRoutes.formFields,
-          },
-          {
-            title: "Simple Forms",
-            url: demoRoutes.formSimple,
-          },
-        ],
-      },
-      {
-        title: "Users List",
-        url: demoRoutes.userList,
+        title: "Users",
+        url: userRoutes.userList,
         icon: <Icon icon="solar:user-bold" width="1.5em" height="1.5em" />,
       },
       {
-        title: "Add Product",
-        url: demoRoutes.addProduct,
-        icon: (
-          <Icon
-            icon="icon-park-outline:ad-product"
-            width="1.5em"
-            height="1.5em"
-          />
-        ),
+        title: "Cameras",
+        url: cameraRoutes.cameraList,
+        icon: <Icon icon="solar:camera-bold" width="1.5em" height="1.5em" />,
+      },
+      {
+        title: "Entrances",
+        url: entranceRoutes.entranceList,
+        icon: <Icon icon="solar:home-2-bold" width="1.5em" height="1.5em" />,
       },
     ],
   },
+  // {
+  //   section: "Demo",
+  //   items: [
+  //     {
+  //       title: "Dashboard",
+  //       url: adminRoutes.root,
+  //       icon: <Icon icon="ic:round-dashboard" width="1.5em" height="1.5em" />,
+  //     },
+  //     // {
+  //     //   title: "Forms",
+  //     //   icon: (
+  //     //     <Icon
+  //     //       icon="fluent:form-24-regular"
+  //     //       width="1.8em"
+  //     //       height="1.8em"
+  //     //       style={{ marginLeft: -5 }}
+  //     //     />
+  //     //   ),
+  //     //   subItems: [
+  //     //     {
+  //     //       title: "Fields",
+  //     //       url: demoRoutes.formFields,
+  //     //     },
+  //     //     {
+  //     //       title: "Simple Forms",
+  //     //       url: demoRoutes.formSimple,
+  //     //     },
+  //     //   ],
+  //     // },
+
+  //     // {
+  //     //   title: "Add Product",
+  //     //   url: demoRoutes.addProduct,
+  //     //   icon: (
+  //     //     <Icon
+  //     //       icon="icon-park-outline:ad-product"
+  //     //       width="1.5em"
+  //     //       height="1.5em"
+  //     //     />
+  //     //   ),
+  //     // },
+  //   ],
+  // },
 ];
 
 // Sidebar Section
@@ -349,7 +360,7 @@ const Sidebar = ({ drawerWidth, mobileOpen, handleDrawerClose, container }) => {
     <div>
       <Toolbar>
         <Box sx={{ p: 2, py: 4 }}>
-          <Box component="img" src={brand.icon} alt="Logo" height="100%" />
+          <Box component="img" src={brand.logo} alt="Logo" width="100%" height="5%"/>
         </Box>
       </Toolbar>
       {sidebarData.map((section) => (

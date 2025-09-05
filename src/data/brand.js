@@ -1,5 +1,5 @@
-import brandIcon from "../assets/vite.svg";
-import brandLogo from "../assets/vite.svg";
+import brandIcon from "../assets/UltraviZ.png";
+import brandLogo from "../assets/UZ by KT.png";
 
 export default {
   name: "HelioWeb Admin",
