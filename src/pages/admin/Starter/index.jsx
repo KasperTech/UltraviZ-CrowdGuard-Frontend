@@ -88,12 +88,12 @@ const CameraMapComponent = ({ cameras, center }) => {
   );
 
   return (
-    <APIProvider apiKey={"AIzaSyDb2jWTTiYmPpuYuEnXiCV7XXP8xZl_Klo"}>
+    <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
       <Box sx={{ width: "100%", height: "70vh", borderRadius: 2, overflow: "hidden" }}>
         <Map
           defaultZoom={12}
           defaultCenter={center}
-          mapId={"44f4ad2c8121323e"}
+          mapId={import.meta.env.VITE_GOOGLE_MAPS_ID}
           style={{ height: "100%", width: "100%" }}
         >
           {cameras.map((camera, index) => (
