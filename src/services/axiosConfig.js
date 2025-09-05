@@ -2,7 +2,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
 const API = axios.create({
-  baseURL: "http://localhost:8000/api/v1",
+  baseURL: "http://localhost:5050/api/v1",
 });
 
 // Request Interceptor - To add token to all requests

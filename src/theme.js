@@ -3,25 +3,25 @@ import { createTheme, responsiveFontSizes } from "@mui/material/styles";
 let theme = createTheme({
   palette: {
     primary: {
-      main: "#4361ee",
+      main: "#33404A",
       contrastText: "#FFF",
     },
     secondary: {
-      main: "#4C3BCF",
+      main: "#94BBD6",
       contrastText: "#FFF",
     },
     background: {
-      main: "#f4f6f8",
+      main: "#F4F9F9",
       contrastText: "#EBD3F8",
     },
     greyNavItem: {
-      main: "#637381",
+      main: "#688396",
     },
   },
   typography: {
     fontFamily: "Poppins, Arial, sans-serif",
   },
-});
+});;
 
 theme = responsiveFontSizes(theme);
 
