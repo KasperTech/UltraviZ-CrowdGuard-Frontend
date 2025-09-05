@@ -43,7 +43,7 @@ const CameraView = () => {
       // You'll need to import and use getCamera function if needed
       // const cameraRes = await getCamera(id);
       // setCamera(cameraRes);
-      
+
       // For now, just set an error since we don't have the function
       setError("Camera data not available. Please navigate from the cameras list.");
     } catch (error) {
@@ -119,13 +119,13 @@ const CameraView = () => {
               </IconButton>
             </Box>
             <Divider sx={{ mb: 2 }} />
-            
+
             {streamError ? (
               <Alert severity="error" sx={{ mb: 2 }}>
                 Unable to load video stream. Please check the stream URL.
               </Alert>
             ) : null}
-            
+
             <Box
               sx={{
                 position: "relative",
@@ -204,7 +204,7 @@ const CameraView = () => {
               Camera Details
             </Typography>
             <Divider sx={{ mb: 2 }} />
-            
+
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
               <Box>
                 <Typography variant="body2" color="textSecondary" gutterBottom>
@@ -212,7 +212,7 @@ const CameraView = () => {
                 </Typography>
                 <Typography variant="body1">{camera.deviceId}</Typography>
               </Box>
-              
+
               <Box>
                 <Typography variant="body2" color="textSecondary" gutterBottom>
                   Entrance
@@ -221,26 +221,26 @@ const CameraView = () => {
                   {camera?.entrance?.name || "Not assigned"}
                 </Typography>
               </Box>
-              
+
               <Box>
                 <Typography variant="body2" color="textSecondary" gutterBottom>
                   IP Address
                 </Typography>
                 <Typography variant="body1">{camera.ipAddress || "Not configured"}</Typography>
               </Box>
-              
+
               <Box>
                 <Typography variant="body2" color="textSecondary" gutterBottom>
                   Location
                 </Typography>
                 <Typography variant="body1">
-                  {camera.location 
+                  {camera.location
                     ? `Lat: ${camera.location.latitude}, Long: ${camera.location.longitude}`
                     : "Not configured"
                   }
                 </Typography>
               </Box>
-              
+
               <Box>
                 <Typography variant="body2" color="textSecondary" gutterBottom>
                   Status
@@ -251,14 +251,14 @@ const CameraView = () => {
                   size="small"
                 />
               </Box>
-              
+
               <Box>
                 <Typography variant="body2" color="textSecondary" gutterBottom>
                   Stream URL
                 </Typography>
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
+                <Typography
+                  variant="body2"
+                  sx={{
                     wordBreak: 'break-word',
                     fontFamily: 'monospace',
                     fontSize: '0.8rem'
@@ -267,7 +267,7 @@ const CameraView = () => {
                   {camera.streamUrl || "Not configured"}
                 </Typography>
               </Box>
-              
+
               <Box>
                 <Typography variant="body2" color="textSecondary" gutterBottom>
                   Created At
@@ -276,7 +276,7 @@ const CameraView = () => {
                   {new Date(camera.createdAt).toLocaleString()}
                 </Typography>
               </Box>
-              
+
               <Box>
                 <Typography variant="body2" color="textSecondary" gutterBottom>
                   Last Updated
@@ -297,7 +297,7 @@ const CameraView = () => {
                 Latest Detection Data
               </Typography>
               <Divider sx={{ mb: 2 }} />
-              
+
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6} md={3}>
                   <Card variant="outlined">
@@ -311,7 +311,7 @@ const CameraView = () => {
                     </CardContent>
                   </Card>
                 </Grid>
-                
+
                 <Grid item xs={12} sm={6} md={3}>
                   <Card variant="outlined">
                     <CardContent sx={{ textAlign: 'center' }}>
@@ -324,7 +324,7 @@ const CameraView = () => {
                     </CardContent>
                   </Card>
                 </Grid>
-                
+
                 <Grid item xs={12} sm={6} md={3}>
                   <Card variant="outlined">
                     <CardContent sx={{ textAlign: 'center' }}>
@@ -337,7 +337,7 @@ const CameraView = () => {
                     </CardContent>
                   </Card>
                 </Grid>
-                
+
                 <Grid item xs={12} sm={6} md={3}>
                   <Card variant="outlined">
                     <CardContent sx={{ textAlign: 'center' }}>
@@ -351,15 +351,15 @@ const CameraView = () => {
                   </Card>
                 </Grid>
               </Grid>
-              
+
               {camera.latestDetection.imageSnapshot && (
                 <Box sx={{ mt: 3 }}>
                   <Typography variant="h6" gutterBottom>
                     Detection Snapshot
                   </Typography>
-                  <Box 
-                    component="img" 
-                    src={camera.latestDetection.imageSnapshot} 
+                  <Box
+                    component="img"
+                    src={camera.latestDetection.imageSnapshot}
                     alt="Detection snapshot"
                     sx={{
                       width: '100%',
@@ -384,38 +384,22 @@ const CameraView = () => {
                 Region of Interest (ROI)
               </Typography>
               <Divider sx={{ mb: 2 }} />
-              
+
               <Grid container spacing={2}>
                 <Grid item xs={6}>
                   <Typography variant="body2" color="textSecondary">
-                    X Position
+                    L1 Value
                   </Typography>
                   <Typography variant="body1">
-                    {camera.roi.x}
+                    {camera.roi.L1}
                   </Typography>
                 </Grid>
                 <Grid item xs={6}>
                   <Typography variant="body2" color="textSecondary">
-                    Y Position
+                    L2 Value
                   </Typography>
                   <Typography variant="body1">
-                    {camera.roi.y}
-                  </Typography>
-                </Grid>
-                <Grid item xs={6}>
-                  <Typography variant="body2" color="textSecondary">
-                    Width
-                  </Typography>
-                  <Typography variant="body1">
-                    {camera.roi.width}
-                  </Typography>
-                </Grid>
-                <Grid item xs={6}>
-                  <Typography variant="body2" color="textSecondary">
-                    Height
-                  </Typography>
-                  <Typography variant="body1">
-                    {camera.roi.height}
+                    {camera.roi.L2}
                   </Typography>
                 </Grid>
               </Grid>

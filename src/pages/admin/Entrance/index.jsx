@@ -21,7 +21,6 @@ import Breadcrumbs from "../../../components/Breadcrumbs";
 import Loader from "../../../components/Loader";
 import ResponsiveTable from "../../../components/ResponsiveTable";
 import EntranceForm from "./elements/EntranceForm";
-// import DeleteRestoreModal from "./elements/DeleteRestoreModal";
 import RenderCard from "./elements/RenderCard";
 import { getEntrances, deleteEntrance, restoreEntrance } from "../../../services/entranceService";
 
@@ -168,8 +167,7 @@ const Entrance = () => {
   const columns = [
     { label: "Entrance Name", key: "name", sortable: true },
     { label: "Description", key: "description", sortable: true },
-    { label: "Medium Threshold", key: "thresholdMedium", sortable: true },
-    { label: "High Threshold", key: "thresholdHigh", sortable: true },
+    { label: "Threshold", key: "threshold", sortable: true }, // Changed from thresholdMedium/thresholdHigh
     { label: "Status", key: "isActive", sortable: true },
     { label: "Created At", key: "createdAt", sortable: true },
   ];
@@ -231,14 +229,28 @@ const Entrance = () => {
         />
       </Modal>
 
-      {/* <Modal open={openDeleteRestoreModal} onClose={() => setOpenDeleteRestoreModal(false)}>
-        <DeleteRestoreModal
-          item={selectedEntrance}
-          itemType="entrance"
-          handleClose={() => setOpenDeleteRestoreModal(false)}
-          onConfirm={handleDeleteRestoreConfirm}
-        />
-      </Modal> */}
+      <Dialog open={openDeleteRestoreModal} onClose={() => setOpenDeleteRestoreModal(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          <Typography variant="h6" fontWeight={600}>
+            {selectedEntrance?.action === 'delete' ? 'Delete Entrance' : 'Restore Entrance'}
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to {selectedEntrance?.action === 'delete' ? 'delete' : 'restore'} the entrance "{selectedEntrance?.name}"?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDeleteRestoreModal(false)}>Cancel</Button>
+          <Button 
+            variant="contained" 
+            color={selectedEntrance?.action === 'delete' ? 'error' : 'success'} 
+            onClick={handleDeleteRestoreConfirm}
+          >
+            {selectedEntrance?.action === 'delete' ? 'Delete' : 'Restore'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Dialog open={openFilterModal} onClose={() => setOpenFilterModal(false)} maxWidth="sm" fullWidth>
         <DialogTitle>

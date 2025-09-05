@@ -5,7 +5,7 @@ import {
   Box,
   Button,
   TextField,
-  Grid, 
+  Grid,
   FormControlLabel,
   Switch,
   Accordion,
@@ -20,7 +20,7 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
   const [submitLoading, setSubmitLoading] = useState(false);
   const [roiExpanded, setRoiExpanded] = useState(false);
   const [locationExpanded, setLocationExpanded] = useState(false);
-  
+
   const {
     control,
     handleSubmit,
@@ -179,12 +179,12 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
                 <Grid container spacing={2}>
                   <Grid item xs={6}>
                     <Controller
-                      name="roi.x"
+                      name="roi.L1"
                       control={control}
                       render={({ field }) => (
                         <TextField
                           {...field}
-                          label="X Coordinate"
+                          label="L1 Value"
                           type="number"
                           fullWidth
                           onChange={(e) => field.onChange(parseInt(e.target.value))}
@@ -194,42 +194,12 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
                   </Grid>
                   <Grid item xs={6}>
                     <Controller
-                      name="roi.y"
+                      name="roi.L2"
                       control={control}
                       render={({ field }) => (
                         <TextField
                           {...field}
-                          label="Y Coordinate"
-                          type="number"
-                          fullWidth
-                          onChange={(e) => field.onChange(parseInt(e.target.value))}
-                        />
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Controller
-                      name="roi.width"
-                      control={control}
-                      render={({ field }) => (
-                        <TextField
-                          {...field}
-                          label="Width"
-                          type="number"
-                          fullWidth
-                          onChange={(e) => field.onChange(parseInt(e.target.value))}
-                        />
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Controller
-                      name="roi.height"
-                      control={control}
-                      render={({ field }) => (
-                        <TextField
-                          {...field}
-                          label="Height"
+                          label="L2 Value"
                           type="number"
                           fullWidth
                           onChange={(e) => field.onChange(parseInt(e.target.value))}

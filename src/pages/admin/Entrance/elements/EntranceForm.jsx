@@ -1,4 +1,3 @@
-// components/Entrance/elements/EntranceForm.js
 import React, { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import {
@@ -23,8 +22,7 @@ const EntranceForm = ({ entrance, handleClose, onSuccess }) => {
     defaultValues: {
       name: entrance?.name || "",
       description: entrance?.description || "",
-      thresholdMedium: entrance?.thresholdMedium || 0,
-      thresholdHigh: entrance?.thresholdHigh || 0,
+      threshold: entrance?.threshold || 0, // Changed from thresholdMedium/thresholdHigh
       isActive: entrance?.isActive !== undefined ? entrance.isActive : true,
     },
   });
@@ -104,47 +102,22 @@ const EntranceForm = ({ entrance, handleClose, onSuccess }) => {
             />
           </Grid>
 
-          <Grid item xs={6}>
+          <Grid item xs={12}>
             <Controller
-              name="thresholdMedium"
+              name="threshold"
               control={control}
               rules={{ 
-                required: "Medium threshold is required",
+                required: "Threshold is required",
                 min: { value: 0, message: "Threshold must be positive" }
               }}
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="Medium Threshold"
+                  label="Threshold"
                   type="number"
                   fullWidth
-                  error={!!errors.thresholdMedium}
-                  helperText={errors.thresholdMedium?.message}
-                  onChange={(e) => field.onChange(parseInt(e.target.value))}
-                />
-              )}
-            />
-          </Grid>
-
-          <Grid item xs={6}>
-            <Controller
-              name="thresholdHigh"
-              control={control}
-              rules={{ 
-                required: "High threshold is required",
-                min: { value: 0, message: "Threshold must be positive" },
-                validate: value => 
-                  parseInt(value) > parseInt(control._formValues.thresholdMedium) || 
-                  "High threshold must be greater than medium threshold"
-              }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="High Threshold"
-                  type="number"
-                  fullWidth
-                  error={!!errors.thresholdHigh}
-                  helperText={errors.thresholdHigh?.message}
+                  error={!!errors.threshold}
+                  helperText={errors.threshold?.message}
                   onChange={(e) => field.onChange(parseInt(e.target.value))}
                 />
               )}
