@@ -123,7 +123,7 @@ const CameraMapComponent = ({ cameras, center }) => {
                     component="img"
                     src={brand.icon}
                     alt="Camera"
-                    sx={{ width: 24, height: 24 }}
+                    sx={{ width: 40, height: 40, }}
                   />
                   <StatusSymbol camera={camera} />
                 </Box>

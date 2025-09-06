@@ -35,6 +35,7 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
       isActive: camera?.isActive !== undefined ? camera.isActive : true,
       ipAddress: camera?.ipAddress || "",
       location: camera?.location || { latitude: "", longitude: "" },
+      threshold: camera?.threshold || 0,
     },
   });
 
@@ -139,20 +140,22 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
           </Grid>
 
           <Grid item xs={6}>
-            <Controller
-              name="streamUrl"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Stream URL"
-                  fullWidth
-                  error={!!errors.streamUrl}
-                  helperText={errors.streamUrl?.message}
-                />
-              )}
-            />
-          </Grid>
+          <Controller
+            name="threshold"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Threshold"
+                type="number"
+                fullWidth
+                onChange={(e) => field.onChange(parseInt(e.target.value))}
+                error={!!errors.threshold}
+                helperText={errors.threshold?.message}
+              />
+            )}
+          />
+        </Grid>
 
           <Grid item xs={6}>
             <Controller
@@ -165,6 +168,22 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
                   fullWidth
                   error={!!errors.ipAddress}
                   helperText={errors.ipAddress?.message}
+                />
+              )}
+            />
+          </Grid>
+
+             <Grid item xs={12}>
+            <Controller
+              name="streamUrl"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Stream URL"
+                  fullWidth
+                  error={!!errors.streamUrl}
+                  helperText={errors.streamUrl?.message}
                 />
               )}
             />
@@ -272,6 +291,7 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
             />
           </Grid>
         </Grid>
+
 
         <Box mt={3} display="flex" justifyContent="flex-end">
           <Button onClick={handleClose} sx={{ mr: 2 }}>

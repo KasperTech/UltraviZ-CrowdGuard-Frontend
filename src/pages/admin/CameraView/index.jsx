@@ -243,6 +243,15 @@ const CameraView = () => {
 
               <Box>
                 <Typography variant="body2" color="textSecondary" gutterBottom>
+                  Threshold
+                </Typography>
+                <Typography variant="body1">
+                  {camera.threshold || "Not configured"}
+                </Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="body2" color="textSecondary" gutterBottom>
                   Status
                 </Typography>
                 <Chip

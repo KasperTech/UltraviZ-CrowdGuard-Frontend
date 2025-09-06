@@ -22,7 +22,6 @@ const EntranceForm = ({ entrance, handleClose, onSuccess }) => {
     defaultValues: {
       name: entrance?.name || "",
       description: entrance?.description || "",
-      threshold: entrance?.threshold || 0, // Changed from thresholdMedium/thresholdHigh
       isActive: entrance?.isActive !== undefined ? entrance.isActive : true,
     },
   });
@@ -102,27 +101,6 @@ const EntranceForm = ({ entrance, handleClose, onSuccess }) => {
             />
           </Grid>
 
-          <Grid item xs={12}>
-            <Controller
-              name="threshold"
-              control={control}
-              rules={{ 
-                required: "Threshold is required",
-                min: { value: 0, message: "Threshold must be positive" }
-              }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Threshold"
-                  type="number"
-                  fullWidth
-                  error={!!errors.threshold}
-                  helperText={errors.threshold?.message}
-                  onChange={(e) => field.onChange(parseInt(e.target.value))}
-                />
-              )}
-            />
-          </Grid>
 
           <Grid item xs={12}>
             <Controller

@@ -167,7 +167,6 @@ const Entrance = () => {
   const columns = [
     { label: "Entrance Name", key: "name", sortable: true },
     { label: "Description", key: "description", sortable: true },
-    { label: "Threshold", key: "threshold", sortable: true }, // Changed from thresholdMedium/thresholdHigh
     { label: "Status", key: "isActive", sortable: true },
     { label: "Created At", key: "createdAt", sortable: true },
   ];
