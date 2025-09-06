@@ -4,7 +4,7 @@ import {
   Typography,
   Box,
   Paper,
-  Grid,
+  Grid2 as Grid,
   Chip,
   Divider,
   Card,
@@ -13,6 +13,7 @@ import {
   Alert,
   CircularProgress,
   IconButton,
+  Snackbar,
 } from "@mui/material";
 import {
   ArrowBack as ArrowBackIcon,
@@ -20,6 +21,8 @@ import {
 } from "@mui/icons-material";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Breadcrumbs from "../../../components/Breadcrumbs";
+import { startCamera, stopCamera } from "../../../services/cameraService";
+import { set } from "react-hook-form";
 
 const CameraView = () => {
   const { id } = useParams();
@@ -29,6 +32,10 @@ const CameraView = () => {
   const [loading, setLoading] = useState(!location.state?.camera);
   const [error, setError] = useState("");
   const [streamError, setStreamError] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [cameraOn, setCameraOn] = useState(false);
+  const [message, setMessage] = useState("");
+  const [severity, setSeverity] = useState("success");
 
   useEffect(() => {
     if (!location.state?.camera) {
@@ -37,22 +44,39 @@ const CameraView = () => {
     }
   }, [id]);
 
-  const fetchCameraData = async () => {
-    try {
-      setLoading(true);
-      // You'll need to import and use getCamera function if needed
-      // const cameraRes = await getCamera(id);
-      // setCamera(cameraRes);
 
-      // For now, just set an error since we don't have the function
-      setError("Camera data not available. Please navigate from the cameras list.");
+  const startCameraById = async () => {
+
+    try {
+      await startCamera(camera._id);
+      setSuccess(true)
+      setCameraOn(true)
+      setSeverity("success")
+      setMessage("Camera started successfully")
     } catch (error) {
-      console.error("Error fetching camera:", error);
-      setError("Failed to load camera details");
-    } finally {
-      setLoading(false);
+      console.error("Error starting camera:", error);
+      setSeverity("error")
+      setMessage("Failed to start camera")
+      setSuccess(true)
+
     }
-  };
+  }
+
+  const stopCameraById = async () => {
+
+    try {
+      await stopCamera(camera._id);
+      setCameraOn(false)
+      setSuccess(true)
+      setSeverity("success")
+      setMessage("Camera stopped successfully")
+    } catch (error) {
+      console.error("Error stopping camera:", error);
+      setSeverity("error");
+      setMessage("Failed to stop camera");
+      setSuccess(true);
+    }
+  }
 
   const handleStreamError = () => {
     setStreamError(true);
@@ -74,29 +98,23 @@ const CameraView = () => {
     );
   }
 
-  if (error || !camera) {
-    return (
-      <Container maxWidth="xl" sx={{ p: { xs: 2, sm: 4 } }}>
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error || "Camera not found"}
-        </Alert>
-        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate("/admin/cameras")}>
-          Back to Cameras
-        </Button>
-      </Container>
-    );
-  }
+
+
 
   return (
     <Container maxWidth="xl" sx={{ p: { xs: 2, sm: 4 } }}>
-      <Box sx={{ mb: 3 }}>
-        {/* <Button
-          startIcon={<ArrowBackIcon />}
-          onClick={() => navigate("/admin/cameras")}
-          sx={{ mb: 2 }}
-        >
-          Back to Cameras
-        </Button> */}
+      <Snackbar
+        open={success}
+        autoHideDuration={6000}
+        onClose={() => setSuccess(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setSuccess(false)} severity={severity}>
+          {message}
+        </Alert>
+      </Snackbar>
+
+      <Box sx={{ mb: 2 }}>
         <Breadcrumbs items={breadcrumbItems} />
       </Box>
 
@@ -108,15 +126,20 @@ const CameraView = () => {
 
       <Grid container spacing={3}>
         {/* Live Stream Section */}
-        <Grid item xs={12} lg={8}>
+        <Grid size={{ xs: 12, lg: 8 }}>
           <Paper sx={{ p: 2, borderRadius: 3, mb: 3 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Typography variant="h6">
                 Live Stream
               </Typography>
-              <IconButton onClick={fetchCameraData} size="small">
+              {cameraOn ? (<Button onClick={stopCameraById} size="small" variant="outlined" color="error">
+                Stop Detection
+              </Button>) : (<Button onClick={startCameraById} size="small" variant="contained" color="primary">
+                Start Detection
+              </Button>)}
+              {/* <IconButton onClick={fetchCameraData} size="small">
                 <RefreshIcon />
-              </IconButton>
+              </IconButton> */}
             </Box>
             <Divider sx={{ mb: 2 }} />
 
@@ -136,12 +159,11 @@ const CameraView = () => {
                 backgroundColor: "#000",
               }}
             >
-              {camera.streamUrl ? (
-                camera.streamUrl.includes("youtube.com") || camera.streamUrl.includes("youtu.be") ? (
+              {cameraOn ? (
+                true ? (
                   <iframe
-                    src={camera.streamUrl
-                      .replace("watch?v=", "embed/")
-                      .replace("youtu.be/", "youtube.com/embed/")}
+                    src={
+                      "http://localhost:5000/api/camera/video_feed/68bbcc5a67c2bdbb7660f95d"}
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
@@ -149,8 +171,8 @@ const CameraView = () => {
                       position: "absolute",
                       top: 0,
                       left: 0,
-                      width: "100%",
-                      height: "100%",
+                      width: "1024px",
+                      height: "576px",
                     }}
                     onError={handleStreamError}
                     title={`Live stream from ${camera.name}`}
@@ -190,7 +212,7 @@ const CameraView = () => {
                   right={0}
                   bottom={0}
                 >
-                  <Typography>No stream URL configured</Typography>
+                  <Typography>Please start the detection for live view </Typography>
                 </Box>
               )}
             </Box>
@@ -198,7 +220,7 @@ const CameraView = () => {
         </Grid>
 
         {/* Camera Details Section */}
-        <Grid item xs={12} lg={4}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <Paper sx={{ p: 2, borderRadius: 3, mb: 3 }}>
             <Typography variant="h6" gutterBottom>
               Camera Details
@@ -286,135 +308,59 @@ const CameraView = () => {
                 </Typography>
               </Box>
 
-              <Box>
-                <Typography variant="body2" color="textSecondary" gutterBottom>
-                  Last Updated
-                </Typography>
-                <Typography variant="body1">
-                  {new Date(camera.updatedAt).toLocaleString()}
-                </Typography>
-              </Box>
+
             </Box>
           </Paper>
         </Grid>
 
-        {/* Detection Data and ROI Sections - Now aligned horizontally */}
-        {camera.latestDetection && (
-          <Grid item xs={12} lg={8}>
-            <Paper sx={{ p: 2, borderRadius: 3, height: '100%' }}>
-              <Typography variant="h6" gutterBottom>
-                Latest Detection Data
-              </Typography>
-              <Divider sx={{ mb: 2 }} />
-
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6} md={3}>
-                  <Card variant="outlined">
-                    <CardContent sx={{ textAlign: 'center' }}>
-                      <Typography variant="h4" color="primary" gutterBottom>
-                        {camera.latestDetection.count}
-                      </Typography>
-                      <Typography variant="body2">
-                        People Count
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={3}>
-                  <Card variant="outlined">
-                    <CardContent sx={{ textAlign: 'center' }}>
-                      <Typography variant="h4" color="secondary" gutterBottom>
-                        {camera.latestDetection.density}
-                      </Typography>
-                      <Typography variant="body2">
-                        Density
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={3}>
-                  <Card variant="outlined">
-                    <CardContent sx={{ textAlign: 'center' }}>
-                      <Typography variant="h6" gutterBottom>
-                        {new Date(camera.latestDetection.timestamp).toLocaleDateString()}
-                      </Typography>
-                      <Typography variant="body2">
-                        Date
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={3}>
-                  <Card variant="outlined">
-                    <CardContent sx={{ textAlign: 'center' }}>
-                      <Typography variant="h6" gutterBottom>
-                        {new Date(camera.latestDetection.timestamp).toLocaleTimeString()}
-                      </Typography>
-                      <Typography variant="body2">
-                        Time
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              </Grid>
-
-              {camera.latestDetection.imageSnapshot && (
-                <Box sx={{ mt: 3 }}>
-                  <Typography variant="h6" gutterBottom>
-                    Detection Snapshot
-                  </Typography>
-                  <Box
-                    component="img"
-                    src={camera.latestDetection.imageSnapshot}
-                    alt="Detection snapshot"
-                    sx={{
-                      width: '100%',
-                      maxHeight: 300,
-                      objectFit: 'contain',
-                      borderRadius: 2,
-                      border: '1px solid',
-                      borderColor: 'divider'
-                    }}
-                  />
-                </Box>
-              )}
-            </Paper>
-          </Grid>
-        )}
-
         {/* ROI Information - Now aligned with Detection Data */}
-        {camera.roi && (
-          <Grid item xs={12} lg={4}>
-            <Paper sx={{ p: 2, borderRadius: 3, height: '100%' }}>
-              <Typography variant="h6" gutterBottom>
-                Region of Interest (ROI)
-              </Typography>
-              <Divider sx={{ mb: 2 }} />
+      </Grid>
+      <Grid container spacing={3}>
+        <Grid size={{ xs: 12, lg: 8 }}>
+          <Paper sx={{ p: 2, borderRadius: 3, mb: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Region of Interest (ROI) Information
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
+            {camera.roi ? (
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <Box>
+                  <Typography variant="body2" color="textSecondary" gutterBottom>
+                    ROI Coordinates
+                  </Typography>
+                  <Typography variant="body1">
+                    {`Height: 576px, Width: 1024px, L1: ${camera.roi.L1}, L2: ${camera.roi.L2}`}
+                  </Typography>
+                </Box>
 
-              <Grid container spacing={2}>
-                <Grid item xs={6}>
-                  <Typography variant="body2" color="textSecondary">
-                    L1 Value
+                {/* <Box>
+                  <Typography variant="body2" color="textSecondary" gutterBottom>
+                    Description
                   </Typography>
                   <Typography variant="body1">
-                    {camera.roi.L1}
+                    {camera.roi.description || "No description provided"}
                   </Typography>
-                </Grid>
-                <Grid item xs={6}>
-                  <Typography variant="body2" color="textSecondary">
-                    L2 Value
-                  </Typography>
-                  <Typography variant="body1">
-                    {camera.roi.L2}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Paper>
-          </Grid>
-        )}
+                </Box> */}
+              </Box>
+            ) : (
+              <Typography>No ROI information configured for this camera.</Typography>
+            )}
+          </Paper>
+        </Grid>
+        <Grid size={{ xs: 12, lg: 4 }}>
+          <Paper sx={{ p: 2, borderRadius: 3, mb: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Rate of Change of People
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
+            <Typography variant="body2" color="textSecondary" gutterBottom>
+              In people/minute
+            </Typography>
+            <Typography variant="body1">
+              10 people/minute
+            </Typography>
+          </Paper>
+        </Grid>
       </Grid>
     </Container>
   );

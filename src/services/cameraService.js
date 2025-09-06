@@ -59,3 +59,25 @@ export const restoreCamera = async (id) => {
         throw error;
     }
 };
+
+
+export const startCamera = async (id) => {
+    try {
+        const response = await API.post(`/admin/camera/${id}/start`);
+        return response.data.data;
+    } catch (error) {
+        console.error("Start camera failed", error);
+        throw error;
+    }
+}
+
+
+export const stopCamera = async (id) => {
+    try {
+        const response = await API.post(`/admin/camera/${id}/stop`);
+        return response.data.data;
+    } catch (error) {
+        console.error("Stop camera failed", error);
+        throw error;    
+    }
+}
