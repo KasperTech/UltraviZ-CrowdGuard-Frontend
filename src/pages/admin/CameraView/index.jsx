@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Container,
   Typography,
@@ -40,6 +40,8 @@ const CameraView = () => {
   const [chartDataY, setChartDataY] = useState([]);
 
   const { socket } = useSocket()
+  const bufferRef = useRef([]); // to collect counts before averaging
+
 
   useEffect(() => {
     if (!location.state?.camera) {
@@ -50,26 +52,97 @@ const CameraView = () => {
 
 
 
+  const handleCountUpdate = (data) => {
+    bufferRef.current.push(data.count);
+    console.log("Buffer:", bufferRef.current);
+
+    // Once we have 5 values, compute mean
+    if (bufferRef.current.length === 5) {
+      const mean =
+        bufferRef.current.reduce((a, b) => a + b, 0) /
+        bufferRef.current.length;
+
+      // Clear buffer
+      bufferRef.current = [];
+
+      // Update chart with mean value
+      setChartDataX((prev) => {
+        const newData = [...prev, new Date().toLocaleTimeString()];
+        return newData.slice(-10); // keep last 10 time points
+      });
+      setChartDataY((prev) => {
+        const newData = [...prev, mean];
+        return newData.slice(-10); // keep last 10 means
+      });
+    }
+
+  }
+
+  // useEffect(() => {
+  //   if (!socket) return;
+  //   socket.on('countUpdate', (data) => {
+  //     data = JSON.parse(data)
+  //     console.log('countUpdate', data);
+  //     if (data.camera_id === id) {
+  //       // setChartDataX((prev) => {
+  //       //   const newData = [...prev, new Date().toLocaleTimeString()];
+  //       //   return newData.slice(-10); // Keep only the last 5 entries
+  //       // });
+  //       // setChartDataY((prev) => {
+  //       //   const newData = [...prev, data.count];
+  //       //   return newData.slice(-10); // Keep only the last 10 entries
+  //       // });
+  //       handleCountUpdate(data);
+  //     }
+  //   });
+  //   return () => {
+  //     socket.off("countUpdate", handleCountUpdate);
+  //   };
+  // }, [socket]);
+
+
   useEffect(() => {
     if (!socket) return;
-    socket.on('countUpdate', (data) => {
-      data = JSON.parse(data)
-      console.log('countUpdate', data);
+
+    const handleCountUpdate = (data) => {
+      data = JSON.parse(data);
+      console.log("countUpdate", data);
+
       if (data.camera_id === id) {
-        setChartDataX((prev) => {
-          const newData = [...prev, new Date().toLocaleTimeString()];
-          return newData.slice(-10); // Keep only the last 5 entries
-        });
-        setChartDataY((prev) => {
-          const newData = [...prev, data.count];
-          return newData.slice(-10); // Keep only the last 10 entries
-        });
+        bufferRef.current.push(data.count);
+
+        if (bufferRef.current.length === 5) {
+          const mean =
+            bufferRef.current.reduce((a, b) => a + b, 0) /
+            bufferRef.current.length;
+
+          bufferRef.current = []; // reset buffer
+
+          setChartDataX((prev) => {
+            const newData = [...prev, new Date().toLocaleTimeString()];
+            return newData.slice(-10);
+          });
+          setChartDataY((prev) => {
+            const newData = [...prev, mean];
+            return newData.slice(-10);
+          });
+        }
       }
-    });
-  }, [socket]);
+    };
+
+    socket.on("countUpdate", handleCountUpdate);
+
+    return () => {
+      socket.off("countUpdate", handleCountUpdate);
+    };
+  }, [socket, id]);
+
+
+  console.log("Chart Data X:", chartDataX);
+  console.log("Chart Data Y:", chartDataY);
+
 
   const startCameraById = async () => {
-
     try {
       await startCamera(camera._id);
       setSuccess(true)
@@ -343,7 +416,7 @@ const CameraView = () => {
                   Real time graph
                 </Typography>
                 <Divider sx={{ mb: 2 }} />
-                <div>
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                   {true ? (<LineChart
                     colors={['#94BBD6']}
                     xAxis={[{ scaleType: 'band', data: chartDataX }]}
@@ -353,7 +426,7 @@ const CameraView = () => {
                   />) : (<Typography variant="body2" color="textSecondary" gutterBottom>
                     Start the detection to view real time graph
                   </Typography>)}
-                </div>
+                </Box>
                 {/* Add any additional information you want to display here */}
               </Paper>
             </Box>
