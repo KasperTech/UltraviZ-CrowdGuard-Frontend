@@ -41,6 +41,10 @@ const CameraView = () => {
 
   const { socket } = useSocket()
   const bufferRef = useRef([]); // to collect counts before averaging
+  const lastMeanRef = useRef(null);
+  const lastTimeRef = useRef(null);
+  const [rate, setRate] = useState("N/A")
+
 
 
   useEffect(() => {
@@ -51,32 +55,6 @@ const CameraView = () => {
   }, [id]);
 
 
-
-  const handleCountUpdate = (data) => {
-    bufferRef.current.push(data.count);
-    console.log("Buffer:", bufferRef.current);
-
-    // Once we have 5 values, compute mean
-    if (bufferRef.current.length === 5) {
-      const mean =
-        bufferRef.current.reduce((a, b) => a + b, 0) /
-        bufferRef.current.length;
-
-      // Clear buffer
-      bufferRef.current = [];
-
-      // Update chart with mean value
-      setChartDataX((prev) => {
-        const newData = [...prev, new Date().toLocaleTimeString()];
-        return newData.slice(-10); // keep last 10 time points
-      });
-      setChartDataY((prev) => {
-        const newData = [...prev, mean];
-        return newData.slice(-10); // keep last 10 means
-      });
-    }
-
-  }
 
   // useEffect(() => {
   //   if (!socket) return;
@@ -117,6 +95,33 @@ const CameraView = () => {
             bufferRef.current.length;
 
           bufferRef.current = []; // reset buffer
+          const now = new Date();
+
+          let ratePerMinute = null;
+          if (lastMeanRef.current !== null && lastTimeRef.current !== null) {
+            const deltaPeople = mean - lastMeanRef.current;
+            const deltaTimeMin =
+              (now.getTime() - lastTimeRef.current.getTime()) / 60000; // ms → minutes
+
+            if (deltaTimeMin > 0) {
+              ratePerMinute = deltaPeople / deltaTimeMin;
+            }
+          }
+
+          // store current as "last" for next round
+          lastMeanRef.current = mean;
+          lastTimeRef.current = now;
+
+          console.log(
+            "Mean:",
+            mean,
+            "Rate of change (people/min):",
+            ratePerMinute
+          );
+          setRate(ratePerMinute ? ratePerMinute.toFixed(2) : "N/A");
+
+
+
 
           setChartDataX((prev) => {
             const newData = [...prev, new Date().toLocaleTimeString()];
@@ -477,7 +482,7 @@ const CameraView = () => {
               In people/minute
             </Typography>
             <Typography variant="body1">
-              10 people/minute
+              {rate}
             </Typography>
           </Paper>
         </Grid>
