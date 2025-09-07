@@ -15,13 +15,13 @@ const AlertListener = () => {
     socket.on('globalAlert', (alert) => {
       console.log('globalAlert', alert);
       // Only show if user is admin
-  
         showAlertToast(alert);
-      
     });
 
     // Also listen for entrance-specific alerts
     socket.on('newAlert', (alert) => {
+      alert = JSON.parse(alert);
+      console.log('newAlert', alert);
       showAlertToast(alert);
     });
 
@@ -33,17 +33,17 @@ const AlertListener = () => {
 
   const showAlertToast = (alert) => {
     let toastOptions = {
-      duration: 6000,
+      duration: 2000,
       position: 'top-center',
     };
 
     switch(alert.severity) {
       case 'critical':
         toast.error(
-          `CRITICAL: ${alert.title}\n${alert.message}`,
+          `CRITICAL: ${alert.alert}`,
           { 
             ...toastOptions,
-            duration: 10000,
+            duration: 2000,
             style: {
               background: '#fef2f2',
               border: '1px solid #fecaca',
@@ -67,7 +67,7 @@ const AlertListener = () => {
         break;
       case 'medium':
         toast(
-          `MEDIUM: ${alert.title}\n${alert.message}`,
+          `MEDIUM: ${alert.alert}`,
           { 
             ...toastOptions,
             style: {

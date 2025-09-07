@@ -15,14 +15,13 @@ import {
   IconButton,
   Snackbar,
 } from "@mui/material";
-import {
-  ArrowBack as ArrowBackIcon,
-  Refresh as RefreshIcon,
-} from "@mui/icons-material";
+
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Breadcrumbs from "../../../components/Breadcrumbs";
 import { startCamera, stopCamera } from "../../../services/cameraService";
 import { set } from "react-hook-form";
+import { LineChart, LinePlot } from "@mui/x-charts";
+import { useSocket } from "../../../context/SocketContext";
 
 const CameraView = () => {
   const { id } = useParams();
@@ -37,6 +36,11 @@ const CameraView = () => {
   const [message, setMessage] = useState("");
   const [severity, setSeverity] = useState("success");
 
+  const [chartDataX, setChartDataX] = useState([]);
+  const [chartDataY, setChartDataY] = useState([]);
+
+  const { socket } = useSocket()
+
   useEffect(() => {
     if (!location.state?.camera) {
       // If camera data wasn't passed, fetch it
@@ -44,6 +48,25 @@ const CameraView = () => {
     }
   }, [id]);
 
+
+
+  useEffect(() => {
+    if (!socket) return;
+    socket.on('countUpdate', (data) => {
+      data = JSON.parse(data)
+      console.log('countUpdate', data);
+      if (data.camera_id === id) {
+        setChartDataX((prev) => {
+          const newData = [...prev, new Date().toLocaleTimeString()];
+          return newData.slice(-10); // Keep only the last 5 entries
+        });
+        setChartDataY((prev) => {
+          const newData = [...prev, data.count];
+          return newData.slice(-10); // Keep only the last 10 entries
+        });
+      }
+    });
+  }, [socket]);
 
   const startCameraById = async () => {
 
@@ -163,7 +186,7 @@ const CameraView = () => {
                 true ? (
                   <iframe
                     src={
-                      "http://localhost:5000/api/camera/video_feed/68bbcc5a67c2bdbb7660f95d"}
+                      "http://localhost:5000/api/camera/video_feed/" + id}
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
@@ -221,30 +244,33 @@ const CameraView = () => {
 
         {/* Camera Details Section */}
         <Grid size={{ xs: 12, lg: 4 }}>
-          <Paper sx={{ p: 2, borderRadius: 3, mb: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Camera Details
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <Paper sx={{ p: 2, borderRadius: 3, mb: 2 }}>
+              <Typography variant="h6" gutterBottom>
+                Camera Details
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
 
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <Box>
-                <Typography variant="body2" color="textSecondary" gutterBottom>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <Box>
+                  {/* <Typography variant="body2" color="textSecondary" gutterBottom>
                   Device ID
-                </Typography>
-                <Typography variant="body1">{camera.deviceId}</Typography>
-              </Box>
+                </Typography> */}
+                  <Typography variant="body1"><b>Device Id: </b>
+                    {camera.deviceId}</Typography>
+                </Box>
 
-              <Box>
-                <Typography variant="body2" color="textSecondary" gutterBottom>
-                  Entrance
-                </Typography>
-                <Typography variant="body1">
-                  {camera?.entrance?.name || "Not assigned"}
-                </Typography>
-              </Box>
+                <Box>
+                  {/* <Typography variant="body2" color="textSecondary" gutterBottom>
+                 
+                </Typography> */}
+                  <Typography variant="body1">
+                    <b>Entrance: </b>
+                    {camera?.entrance?.name || "Not assigned"}
+                  </Typography>
+                </Box>
 
-              <Box>
+                {/* <Box>
                 <Typography variant="body2" color="textSecondary" gutterBottom>
                   IP Address
                 </Typography>
@@ -261,18 +287,18 @@ const CameraView = () => {
                     : "Not configured"
                   }
                 </Typography>
-              </Box>
+              </Box> */}
 
-              <Box>
-                <Typography variant="body2" color="textSecondary" gutterBottom>
+                <Box>
+                  {/* <Typography variant="body2" color="textSecondary">
                   Threshold
-                </Typography>
-                <Typography variant="body1">
-                  {camera.threshold || "Not configured"}
-                </Typography>
-              </Box>
+                </Typography> */}
+                  <Typography variant="body1">
+                    <b>Threshold:</b>  {camera.threshold || "Not configured"}
+                  </Typography>
+                </Box>
 
-              <Box>
+                {/* <Box>
                 <Typography variant="body2" color="textSecondary" gutterBottom>
                   Status
                 </Typography>
@@ -281,9 +307,9 @@ const CameraView = () => {
                   color={camera.isActive ? "success" : "error"}
                   size="small"
                 />
-              </Box>
+              </Box> */}
 
-              <Box>
+                {/* <Box>
                 <Typography variant="body2" color="textSecondary" gutterBottom>
                   Stream URL
                 </Typography>
@@ -306,11 +332,32 @@ const CameraView = () => {
                 <Typography variant="body1">
                   {new Date(camera.createdAt).toLocaleString()}
                 </Typography>
+              </Box> */}
+
+
               </Box>
-
-
+            </Paper>
+            <Box sx={{ width: '100%' }}>
+              <Paper sx={{ p: 2, borderRadius: 3, mb: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  Real time graph
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                <div>
+                  {true ? (<LineChart
+                    colors={['#94BBD6']}
+                    xAxis={[{ scaleType: 'band', data: chartDataX }]}
+                    series={[{ data: chartDataY, label: 'People Count' }]}
+                    width={500}   // ✅ must be a number
+                    height={300}
+                  />) : (<Typography variant="body2" color="textSecondary" gutterBottom>
+                    Start the detection to view real time graph
+                  </Typography>)}
+                </div>
+                {/* Add any additional information you want to display here */}
+              </Paper>
             </Box>
-          </Paper>
+          </Box>
         </Grid>
 
         {/* ROI Information - Now aligned with Detection Data */}
