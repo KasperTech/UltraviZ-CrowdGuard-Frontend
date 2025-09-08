@@ -83,7 +83,7 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
             <Controller
               name="entranceId"
               control={control}
-              rules={{ required: "Entrance is required" }}
+              rules={{ required: "Route is required" }}
               render={({ field }) => (
                 <Autocomplete
                   options={entrances}
@@ -95,7 +95,7 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="Select Entrance"
+                      label="Select Route"
                       error={!!errors.entranceId}
                       helperText={errors.entranceId?.message}
                     />

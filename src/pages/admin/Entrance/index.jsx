@@ -26,7 +26,7 @@ import { getEntrances, deleteEntrance, restoreEntrance } from "../../../services
 
 const breadcrumbItems = [
   { label: "Dashboard", link: "/admin" },
-  { label: "Entrances" },
+  { label: "Routes" },
 ];
 
 // Debounce hook
@@ -165,7 +165,7 @@ const Entrance = () => {
   };
 
   const columns = [
-    { label: "Entrance Name", key: "name", sortable: true },
+    { label: "Route Name", key: "name", sortable: true },
     { label: "Description", key: "description", sortable: true },
     { label: "Status", key: "isActive", sortable: true },
     { label: "Created At", key: "createdAt", sortable: true },
@@ -175,7 +175,7 @@ const Entrance = () => {
     <Container maxWidth="xl" sx={{ p: { xs: 2, sm: 4 } }}>
       <Box>
         <Typography variant="h5" fontWeight={600} mb={2}>
-          Entrance Management
+          Route Management
         </Typography>
         <Breadcrumbs items={breadcrumbItems} />
         <Divider style={{ marginTop: 16, marginBottom: 16 }} />
@@ -183,7 +183,7 @@ const Entrance = () => {
         <Paper sx={{ my: 4, p: { xs: 2, md: 4 }, borderRadius: 3 }}>
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 3, mb: 2, flexDirection: { xs: "column", sm: "row" } }}>
             <Typography variant="h5" fontWeight={600}>
-              Entrances
+              Routes
             </Typography>
             <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexDirection: { xs: "column", sm: "row" } }}>
               <TextField
@@ -195,7 +195,7 @@ const Entrance = () => {
                 sx={{ width: 400 }}
               />
               <Button variant="contained" color="primary" onClick={() => handleEntranceModal(null)}>
-                Add Entrance
+                Add Route
               </Button>
               <IconButton onClick={() => setOpenFilterModal(true)}>
                 <FilterListIcon />
@@ -254,7 +254,7 @@ const Entrance = () => {
       <Dialog open={openFilterModal} onClose={() => setOpenFilterModal(false)} maxWidth="sm" fullWidth>
         <DialogTitle>
           <Typography variant="h6" fontWeight={600}>
-            Filter Entrances
+            Filter Rooutes
           </Typography>
         </DialogTitle>
         <DialogContent>

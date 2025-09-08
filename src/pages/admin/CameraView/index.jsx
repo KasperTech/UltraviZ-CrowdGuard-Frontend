@@ -320,98 +320,7 @@ const CameraView = () => {
         {/* Camera Details Section */}
         <Grid size={{ xs: 12, lg: 4 }}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-            <Paper sx={{ p: 2, borderRadius: 3, mb: 2 }}>
-              <Typography variant="h6" gutterBottom>
-                Camera Details
-              </Typography>
-              <Divider sx={{ mb: 2 }} />
 
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                <Box>
-                  {/* <Typography variant="body2" color="textSecondary" gutterBottom>
-                  Device ID
-                </Typography> */}
-                  <Typography variant="body1"><b>Device Id: </b>
-                    {camera.deviceId}</Typography>
-                </Box>
-
-                <Box>
-                  {/* <Typography variant="body2" color="textSecondary" gutterBottom>
-                 
-                </Typography> */}
-                  <Typography variant="body1">
-                    <b>Entrance: </b>
-                    {camera?.entrance?.name || "Not assigned"}
-                  </Typography>
-                </Box>
-
-                {/* <Box>
-                <Typography variant="body2" color="textSecondary" gutterBottom>
-                  IP Address
-                </Typography>
-                <Typography variant="body1">{camera.ipAddress || "Not configured"}</Typography>
-              </Box>
-
-              <Box>
-                <Typography variant="body2" color="textSecondary" gutterBottom>
-                  Location
-                </Typography>
-                <Typography variant="body1">
-                  {camera.location
-                    ? `Lat: ${camera.location.latitude}, Long: ${camera.location.longitude}`
-                    : "Not configured"
-                  }
-                </Typography>
-              </Box> */}
-
-                <Box>
-                  {/* <Typography variant="body2" color="textSecondary">
-                  Threshold
-                </Typography> */}
-                  <Typography variant="body1">
-                    <b>Threshold:</b>  {camera.threshold || "Not configured"}
-                  </Typography>
-                </Box>
-
-                {/* <Box>
-                <Typography variant="body2" color="textSecondary" gutterBottom>
-                  Status
-                </Typography>
-                <Chip
-                  label={camera.isActive ? "Active" : "Inactive"}
-                  color={camera.isActive ? "success" : "error"}
-                  size="small"
-                />
-              </Box> */}
-
-                {/* <Box>
-                <Typography variant="body2" color="textSecondary" gutterBottom>
-                  Stream URL
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    wordBreak: 'break-word',
-                    fontFamily: 'monospace',
-                    fontSize: '0.8rem'
-                  }}
-                >
-                  {camera.streamUrl || "Not configured"}
-                </Typography>
-              </Box>
-
-              <Box>
-                <Typography variant="body2" color="textSecondary" gutterBottom>
-                  Created At
-                </Typography>
-                <Typography variant="body1">
-                  {new Date(camera.createdAt).toLocaleString()}
-                </Typography>
-              </Box> */}
-
-
-              </Box>
-            </Paper>
             <Box sx={{ width: '100%' }}>
               <Paper sx={{ p: 2, borderRadius: 3, mb: 3 }}>
                 <Typography variant="h6" gutterBottom>
@@ -421,8 +330,13 @@ const CameraView = () => {
                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                   {true ? (<LineChart
                     colors={['#94BBD6']}
-                    xAxis={[{ scaleType: 'band', data: chartDataX }]}
-                    series={[{ data: chartDataY, label: 'People Count' }]}
+                    xAxis={[{ scaleType: 'band', data: chartDataX, label: "Time ➜" }]}
+                    yAxis={[
+                      {
+                        label: 'Count',
+                      },
+                    ]}
+                    series={[{ data: chartDataY, label: 'Mean Count' }]}
                     width={500}   // ✅ must be a number
                     height={300}
                   />) : (<Typography variant="body2" color="textSecondary" gutterBottom>
@@ -431,6 +345,21 @@ const CameraView = () => {
                 </Box>
                 {/* Add any additional information you want to display here */}
               </Paper>
+            </Box>
+            <Box sx={{ width: '100%' }}>
+              <Paper sx={{ p: 2, borderRadius: 3, mb: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  Rate of Change of People
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                <Typography variant="body2" color="textSecondary" gutterBottom>
+                  In people/minute
+                </Typography>
+                <Typography variant="body1">
+                  {rate}
+                </Typography>
+              </Paper>
+
             </Box>
           </Box>
         </Grid>
@@ -506,18 +435,74 @@ const CameraView = () => {
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, lg: 4 }}>
-          <Paper sx={{ p: 2, borderRadius: 3, mb: 3 }}>
+          <Paper sx={{ p: 2, borderRadius: 3, mb: 2 }}>
             <Typography variant="h6" gutterBottom>
-              Rate of Change of People
+              Camera Details
             </Typography>
             <Divider sx={{ mb: 2 }} />
-            <Typography variant="body2" color="textSecondary" gutterBottom>
-              In people/minute
-            </Typography>
-            <Typography variant="body1">
-              {rate}
-            </Typography>
+
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <Box>
+                {/* <Typography variant="body2" color="textSecondary" gutterBottom>
+                  Device ID
+                </Typography> */}
+                <Typography variant="body1"><b>Device Id: </b>
+                  {camera.deviceId}</Typography>
+              </Box>
+
+              <Box>
+                {/* <Typography variant="body2" color="textSecondary" gutterBottom>
+                 
+                </Typography> */}
+                <Typography variant="body1">
+                  <b>Entrance: </b>
+                  {camera?.entrance?.name || "Not assigned"}
+                </Typography>
+              </Box>
+
+              {/* <Box>
+                <Typography variant="body2" color="textSecondary" gutterBottom>
+                  IP Address
+                </Typography>
+                <Typography variant="body1">{camera.ipAddress || "Not configured"}</Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="body2" color="textSecondary" gutterBottom>
+                  Location
+                </Typography>
+                <Typography variant="body1">
+                  {camera.location
+                    ? `Lat: ${camera.location.latitude}, Long: ${camera.location.longitude}`
+                    : "Not configured"
+                  }
+                </Typography>
+              </Box> */}
+
+              <Box>
+                {/* <Typography variant="body2" color="textSecondary">
+                  Threshold
+                </Typography> */}
+                <Typography variant="body1">
+                  <b>Height:</b> 576 px
+                </Typography>
+              </Box>
+
+
+              <Box>
+                {/* <Typography variant="body2" color="textSecondary">
+                  Threshold
+                </Typography> */}
+                <Typography variant="body1">
+                  <b>Width:</b> 1024 px
+                </Typography>
+              </Box>
+
+
+
+            </Box>
           </Paper>
+
         </Grid>
       </Grid>
     </Container>
