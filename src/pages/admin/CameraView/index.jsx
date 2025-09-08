@@ -15,6 +15,7 @@ import {
   IconButton,
   Snackbar,
   TextField,
+  LinearProgress,
 } from "@mui/material";
 
 import { useParams, useNavigate, useLocation } from "react-router-dom";
@@ -23,6 +24,8 @@ import { startCamera, stopCamera, updateCamera } from "../../../services/cameraS
 import { set } from "react-hook-form";
 import { LineChart, LinePlot } from "@mui/x-charts";
 import { useSocket } from "../../../context/SocketContext";
+import GaugeChart from 'react-gauge-chart';
+
 
 const CameraView = () => {
   const { id } = useParams();
@@ -45,7 +48,7 @@ const CameraView = () => {
   const lastTimeRef = useRef(null);
   const [rate, setRate] = useState("N/A")
   const [roi, setRoi] = useState({ l1: camera?.roi?.L1 || 0, l2: camera?.roi?.L2 || 0, threshold: camera?.threshold || 0 });
-
+  const [currentMean, setCurrentMean] = useState(0);
 
 
 
@@ -108,6 +111,7 @@ const CameraView = () => {
           // store current as "last" for next round
           lastMeanRef.current = mean;
           lastTimeRef.current = now;
+          setCurrentMean(mean.toFixed(2));
 
           console.log(
             "Mean:",
@@ -337,7 +341,7 @@ const CameraView = () => {
                       },
                     ]}
                     series={[{ data: chartDataY, label: 'Mean Count' }]}
-                    width={500}   // ✅ must be a number
+                    width={500}
                     height={300}
                   />) : (<Typography variant="body2" color="textSecondary" gutterBottom>
                     Start the detection to view real time graph
@@ -349,15 +353,54 @@ const CameraView = () => {
             <Box sx={{ width: '100%' }}>
               <Paper sx={{ p: 2, borderRadius: 3, mb: 3 }}>
                 <Typography variant="h6" gutterBottom>
-                  Rate of Change of People
+                  Real time prediction and Rate
                 </Typography>
                 <Divider sx={{ mb: 2 }} />
-                <Typography variant="body2" color="textSecondary" gutterBottom>
+                <Grid container spacing={2} alignItems="center" justifyContent="space-between">
+                  <Grid size={{ xs: 12, sm: 6 }} >
+
+                    <GaugeChart
+                      id="people-count-gauge"
+                      nrOfLevels={5}          // number of color segments
+                      colors={["#00C851", "#FFC371", "#FF5F6D",]}  // red → yellow → green
+                      arcWidth={0.1}          // thickness of arc
+                      percent={currentMean / camera.threshold}    // value between 0 and 1
+                      hideseText={true}
+                      needleColor="#345243"
+                      needleBaseColor="#345243"
+                      needleScale={0.4}
+                      style={{ width: '200px' }}
+
+                      formatTextValue={() => `Real time Count: ${currentMean} ppl`}  // custom text
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }} >
+
+                    {rate < 0 ? (
+                      <Typography variant="body2" color="textSecondary" gutterBottom>Crowd under control</Typography>
+                    ) : (
+                      <Typography variant="body2" color="textSecondary" gutterBottom>Time to stampede = {currentMean ? (
+                        `${((camera.threshold - currentMean) / rate).toFixed(2)} minutes`
+                      ) : ("No data available")}</Typography>
+                    )}
+                    <Typography variant="body2" color="textSecondary" gutterBottom>{currentMean ? (
+                      `Current Mean = ${currentMean} ppl`
+                    ) : ("No data available")}</Typography>
+                    <Typography variant="body2">
+                      Rate = {rate} ppl/min
+                    </Typography>
+                  </Grid>
+                </Grid>
+
+
+
+
+                {/* <Typography variant="body2" color="textSecondary" gutterBottom>
                   In people/minute
                 </Typography>
                 <Typography variant="body1">
                   {rate}
-                </Typography>
+                </Typography> */}
               </Paper>
 
             </Box>
@@ -505,7 +548,7 @@ const CameraView = () => {
 
         </Grid>
       </Grid>
-    </Container>
+    </Container >
   );
 };
 
