@@ -5,7 +5,7 @@ import {
   Box,
   Button,
   TextField,
-  Grid,
+  Grid2 as Grid,
   FormControlLabel,
   Switch,
   Accordion,
@@ -79,7 +79,7 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Controller
               name="entranceId"
               control={control}
@@ -105,7 +105,7 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
             />
           </Grid>
 
-          <Grid item xs={6}>
+          <Grid size={{ xs: 6 }}>
             <Controller
               name="deviceId"
               control={control}
@@ -122,7 +122,7 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
             />
           </Grid>
 
-          <Grid item xs={6}>
+          <Grid size={{ xs: 6 }}>
             <Controller
               name="name"
               control={control}
@@ -139,7 +139,7 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
             />
           </Grid>
 
-          <Grid item xs={6}>
+          <Grid size={{ xs: 6 }}>
           <Controller
             name="threshold"
             control={control}
@@ -157,7 +157,7 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
           />
         </Grid>
 
-          <Grid item xs={6}>
+          <Grid size={{ xs: 6 }}>
             <Controller
               name="ipAddress"
               control={control}
@@ -173,7 +173,7 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
             />
           </Grid>
 
-             <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Controller
               name="streamUrl"
               control={control}
@@ -189,14 +189,14 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
             />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Accordion expanded={roiExpanded} onChange={() => setRoiExpanded(!roiExpanded)}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography>ROI Settings</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
-                  <Grid item xs={6}>
+                  <Grid size={{ xs: 6 }}>
                     <Controller
                       name="roi.L1"
                       control={control}
@@ -211,7 +211,7 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
                       )}
                     />
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid size={{ xs: 6 }}>
                     <Controller
                       name="roi.L2"
                       control={control}
@@ -231,14 +231,14 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
             </Accordion>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Accordion expanded={locationExpanded} onChange={() => setLocationExpanded(!locationExpanded)}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography>Location</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
-                  <Grid item xs={6}>
+                  <Grid size={{ xs: 6 }}>
                     <Controller
                       name="location.latitude"
                       control={control}
@@ -253,7 +253,7 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
                       )}
                     />
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid size={{ xs: 6 }}>
                     <Controller
                       name="location.longitude"
                       control={control}
@@ -273,7 +273,7 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
             </Accordion>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Controller
               name="isActive"
               control={control}

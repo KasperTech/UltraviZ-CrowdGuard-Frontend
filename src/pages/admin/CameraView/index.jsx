@@ -14,11 +14,12 @@ import {
   CircularProgress,
   IconButton,
   Snackbar,
+  TextField,
 } from "@mui/material";
 
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Breadcrumbs from "../../../components/Breadcrumbs";
-import { startCamera, stopCamera } from "../../../services/cameraService";
+import { startCamera, stopCamera, updateCamera } from "../../../services/cameraService";
 import { set } from "react-hook-form";
 import { LineChart, LinePlot } from "@mui/x-charts";
 import { useSocket } from "../../../context/SocketContext";
@@ -29,7 +30,6 @@ const CameraView = () => {
   const location = useLocation();
   const [camera, setCamera] = useState(location.state?.camera || null);
   const [loading, setLoading] = useState(!location.state?.camera);
-  const [error, setError] = useState("");
   const [streamError, setStreamError] = useState(false);
   const [success, setSuccess] = useState(false);
   const [cameraOn, setCameraOn] = useState(false);
@@ -44,6 +44,8 @@ const CameraView = () => {
   const lastMeanRef = useRef(null);
   const lastTimeRef = useRef(null);
   const [rate, setRate] = useState("N/A")
+  const [roi, setRoi] = useState({ l1: camera?.roi?.L1 || 0, l2: camera?.roi?.L2 || 0, threshold: camera?.threshold || 0 });
+
 
 
 
@@ -55,29 +57,24 @@ const CameraView = () => {
   }, [id]);
 
 
-
-  // useEffect(() => {
-  //   if (!socket) return;
-  //   socket.on('countUpdate', (data) => {
-  //     data = JSON.parse(data)
-  //     console.log('countUpdate', data);
-  //     if (data.camera_id === id) {
-  //       // setChartDataX((prev) => {
-  //       //   const newData = [...prev, new Date().toLocaleTimeString()];
-  //       //   return newData.slice(-10); // Keep only the last 5 entries
-  //       // });
-  //       // setChartDataY((prev) => {
-  //       //   const newData = [...prev, data.count];
-  //       //   return newData.slice(-10); // Keep only the last 10 entries
-  //       // });
-  //       handleCountUpdate(data);
-  //     }
-  //   });
-  //   return () => {
-  //     socket.off("countUpdate", handleCountUpdate);
-  //   };
-  // }, [socket]);
-
+  const handleROIUpdate = async () => {
+    // Logic to update ROI
+    console.log("Update ROI clicked", camera);
+    let data = { ...camera, roi: { L1: parseInt(roi.l1), L2: parseInt(roi.l2) }, entranceId: camera.entrance._id, threshold: parseInt(roi.threshold) };
+    try {
+      // setLoading(true);
+      await updateCamera(camera._id, data);
+      setCamera({ ...camera, roi: { L1: parseInt(roi.l1), L2: parseInt(roi.l2) }, threshold: parseInt(roi.threshold) })
+      setSuccess(true)
+      setSeverity("success")
+      setMessage("ROI updated successfully")
+    } catch (error) {
+      console.error("Error updating ROI:", error);
+      setSeverity("error")
+      setMessage("Failed to update ROI")
+      setSuccess(true)
+    }
+  }
 
   useEffect(() => {
     if (!socket) return;
@@ -448,25 +445,61 @@ const CameraView = () => {
             </Typography>
             <Divider sx={{ mb: 2 }} />
             {camera.roi ? (
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                <Box>
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12 }}>
                   <Typography variant="body2" color="textSecondary" gutterBottom>
                     ROI Coordinates
                   </Typography>
-                  <Typography variant="body1">
-                    {`Height: 576px, Width: 1024px, L1: ${camera.roi.L1}, L2: ${camera.roi.L2}`}
-                  </Typography>
-                </Box>
+                </Grid>
 
-                {/* <Box>
-                  <Typography variant="body2" color="textSecondary" gutterBottom>
-                    Description
-                  </Typography>
-                  <Typography variant="body1">
-                    {camera.roi.description || "No description provided"}
-                  </Typography>
-                </Box> */}
-              </Box>
+                <Grid size={{ xs: 4 }}>
+                  <TextField
+                    label="L1"
+                    type="number"
+                    fullWidth
+                    value={roi.threshold}
+                    disabled={cameraOn}
+                    onChange={(e) => setRoi({ ...roi, threshold: e.target.value })}
+                  // InputProps={{
+                  //   readOnly: true,
+                  // }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 4 }}>
+                  <TextField
+                    label="L1"
+                    type="number"
+                    fullWidth
+                    value={roi.l1}
+                    disabled={cameraOn}
+                    onChange={(e) => setRoi({ ...roi, l1: e.target.value })}
+                  // InputProps={{
+                  //   readOnly: true,
+                  // }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 4 }}>
+                  <TextField
+                    label="L2"
+                    type="number"
+                    fullWidth
+                    value={roi.l2}
+                    disabled={cameraOn}
+                    onChange={(e) => setRoi({ ...roi, l2: e.target.value })}
+                  // InputProps={{
+                  //   readOnly: true,
+                  // }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 3 }}>
+                  {cameraOn ? (
+                    <Typography variant="body2" color="textSecondary" gutterBottom>
+                      Can't update ROI while detection is running
+                    </Typography>
+                  ) : (<Button variant="contained" color="primary" onClick={handleROIUpdate}>Update ROI</Button>)}
+                </Grid>
+
+              </Grid>
             ) : (
               <Typography>No ROI information configured for this camera.</Typography>
             )}
