@@ -393,14 +393,14 @@ const CameraView = () => {
                     {rate < 0 ? (
                       <Typography variant="body2" color="textSecondary" gutterBottom>Crowd under control</Typography>
                     ) : (
-                      <Typography variant="body2" color="body1" gutterBottom>Time to stampede -{currentMean ? (
-                        `${((camera.threshold - currentMean) / rate).toFixed(2)} minutes`
+                      <Typography variant="body2" color="body1" gutterBottom>Time to stampede: {currentMean ? (
+                        `${((camera.threshold - currentMean) / rate).toFixed(2)} min`
                       ) : ("No data")}</Typography>
                     )}
                     {/* <Typography variant="body2" color="textSecondary" gutterBottom>{currentMean ? (
                       `Current Mean = ${currentMean} ppl`
                     ) : ("No data")}</Typography> */}
-                    <Typography variant="body2" color="textSecondary" gutterBottom>Guards required -{currentMean ? (
+                    <Typography variant="body2" gutterBottom>Guards required: {currentMean ? (
                       `${numberOfGuards}`
                     ) : ("No data")}</Typography>
                     <Typography variant="body2" sx={{ display: "flex", alignItems: "center", gap: 0.8 }}
