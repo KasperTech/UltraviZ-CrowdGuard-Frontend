@@ -25,7 +25,8 @@ import { set } from "react-hook-form";
 import { LineChart, LinePlot } from "@mui/x-charts";
 import { useSocket } from "../../../context/SocketContext";
 import GaugeChart from 'react-gauge-chart';
-
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import { ArrowUpward, Moving, TrendingDown } from "@mui/icons-material";
 
 const CameraView = () => {
   const { id } = useParams();
@@ -49,8 +50,11 @@ const CameraView = () => {
   const [rate, setRate] = useState("N/A")
   const [roi, setRoi] = useState({ l1: camera?.roi?.L1 || 0, l2: camera?.roi?.L2 || 0, threshold: camera?.threshold || 0 });
   const [currentMean, setCurrentMean] = useState(0);
+  const [heatmapEnabled, setHeatmapEnabled] = useState(false);
+  const [numberOfGuards, setNumberOfGuards] = useState(0);
+  const [increment, setIncrement] = useState(null);
 
-
+  const guardsForFifty = 1; // one guard every 50 people
 
   useEffect(() => {
     if (!location.state?.camera) {
@@ -84,7 +88,6 @@ const CameraView = () => {
 
     const handleCountUpdate = (data) => {
       data = JSON.parse(data);
-      console.log("countUpdate", data);
 
       if (data.camera_id === id) {
         bufferRef.current.push(data.count);
@@ -106,6 +109,12 @@ const CameraView = () => {
             if (deltaTimeMin > 0) {
               ratePerMinute = deltaPeople / deltaTimeMin;
             }
+            if (mean > lastMeanRef.current) {
+              setIncrement("up")
+            }
+            else {
+              setIncrement("down")
+            }
           }
 
           // store current as "last" for next round
@@ -119,10 +128,8 @@ const CameraView = () => {
             "Rate of change (people/min):",
             ratePerMinute
           );
+          setNumberOfGuards(Math.ceil(mean / 50) * guardsForFifty);
           setRate(ratePerMinute ? ratePerMinute.toFixed(2) : "N/A");
-
-
-
 
           setChartDataX((prev) => {
             const newData = [...prev, new Date().toLocaleTimeString()];
@@ -184,6 +191,12 @@ const CameraView = () => {
     setStreamError(true);
   };
 
+  const showHeatmap = () => {
+    // Logic to show heatmap
+    console.log("Show Heatmap clicked");
+    setHeatmapEnabled(!heatmapEnabled);
+  }
+
   const breadcrumbItems = [
     { label: "Dashboard", link: "/admin" },
     { label: "Cameras", link: "/admin/cameras" },
@@ -234,6 +247,9 @@ const CameraView = () => {
               <Typography variant="h6">
                 Live Stream
               </Typography>
+              {/* {cameraOn && (<Button onClick={showHeatmap} size="small" variant="outlined">
+                {heatmapEnabled ? "Hide Heatmap" : "Show Heatmap"}
+              </Button>)} */}
               {cameraOn ? (<Button onClick={stopCameraById} size="small" variant="outlined" color="error">
                 Stop Detection
               </Button>) : (<Button onClick={startCameraById} size="small" variant="contained" color="primary">
@@ -262,7 +278,7 @@ const CameraView = () => {
               }}
             >
               {cameraOn ? (
-                true ? (
+                !heatmapEnabled ? (
                   <iframe
                     src={
                       "http://localhost:5000/api/camera/video_feed/" + id}
@@ -280,26 +296,23 @@ const CameraView = () => {
                     title={`Live stream from ${camera.name}`}
                   />
                 ) : (
-                  <Box
-                    display="flex"
-                    justifyContent="center"
-                    alignItems="center"
-                    height="100%"
-                    color="white"
-                    position="absolute"
-                    top={0}
-                    left={0}
-                    right={0}
-                    bottom={0}
-                    flexDirection="column"
-                  >
-                    <Typography variant="h6" gutterBottom>
-                      Stream Unavailable in Browser
-                    </Typography>
-                    <Typography variant="body2" textAlign="center" sx={{ maxWidth: '80%' }}>
-                      For RTSP streams, a dedicated streaming server is required for browser playback.
-                    </Typography>
-                  </Box>
+                  <iframe
+                    src={
+                      "http://localhost:5000/api/camera/heatmap/" + id
+                    }
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "1024px",
+                      height: "576px",
+                    }}
+                    onError={handleStreamError}
+                    title={`Live stream from ${camera.name}`}
+                  />
                 )
               ) : (
                 <Box
@@ -342,7 +355,7 @@ const CameraView = () => {
                     ]}
                     series={[{ data: chartDataY, label: 'Mean Count' }]}
                     width={500}
-                    height={300}
+                    height={250}
                   />) : (<Typography variant="body2" color="textSecondary" gutterBottom>
                     Start the detection to view real time graph
                   </Typography>)}
@@ -365,29 +378,34 @@ const CameraView = () => {
                       colors={["#00C851", "#FFC371", "#FF5F6D",]}  // red → yellow → green
                       arcWidth={0.1}          // thickness of arc
                       percent={currentMean / camera.threshold}    // value between 0 and 1
-                      hideseText={true}
+                      hideText={true}
                       needleColor="#345243"
                       needleBaseColor="#345243"
                       needleScale={0.4}
                       style={{ width: '200px' }}
-
-                      formatTextValue={() => `Real time Count: ${currentMean} ppl`}  // custom text
                     />
+                    <Typography variant="body2" align="center">
+                      Current Count: {currentMean} ppl
+                    </Typography>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }} >
 
                     {rate < 0 ? (
                       <Typography variant="body2" color="textSecondary" gutterBottom>Crowd under control</Typography>
                     ) : (
-                      <Typography variant="body2" color="textSecondary" gutterBottom>Time to stampede = {currentMean ? (
+                      <Typography variant="body2" color="body1" gutterBottom>Time to stampede -{currentMean ? (
                         `${((camera.threshold - currentMean) / rate).toFixed(2)} minutes`
-                      ) : ("No data available")}</Typography>
+                      ) : ("No data")}</Typography>
                     )}
-                    <Typography variant="body2" color="textSecondary" gutterBottom>{currentMean ? (
+                    {/* <Typography variant="body2" color="textSecondary" gutterBottom>{currentMean ? (
                       `Current Mean = ${currentMean} ppl`
-                    ) : ("No data available")}</Typography>
-                    <Typography variant="body2">
-                      Rate = {rate} ppl/min
+                    ) : ("No data")}</Typography> */}
+                    <Typography variant="body2" color="textSecondary" gutterBottom>Guards required -{currentMean ? (
+                      `${numberOfGuards}`
+                    ) : ("No data")}</Typography>
+                    <Typography variant="body2" sx={{ display: "flex", alignItems: "center", gap: 0.8 }}
+                    >
+                      Rate = {rate} ppl/min {increment === "up" ? (<Moving sx={{ fontSize: 25, color: "green" }} />) : (increment === "down" && <TrendingDown sx={{ fontSize: 25, color: "red" }} />)}
                     </Typography>
                   </Grid>
                 </Grid>
