@@ -5,7 +5,7 @@ import {
   Box,
   Button,
   TextField,
-  Grid, 
+  Grid2 as Grid,
   FormControlLabel,
   Switch,
   Accordion,
@@ -20,7 +20,7 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
   const [submitLoading, setSubmitLoading] = useState(false);
   const [roiExpanded, setRoiExpanded] = useState(false);
   const [locationExpanded, setLocationExpanded] = useState(false);
-  
+
   const {
     control,
     handleSubmit,
@@ -35,6 +35,7 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
       isActive: camera?.isActive !== undefined ? camera.isActive : true,
       ipAddress: camera?.ipAddress || "",
       location: camera?.location || { latitude: "", longitude: "" },
+      threshold: camera?.threshold || 0,
     },
   });
 
@@ -78,11 +79,11 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Controller
               name="entranceId"
               control={control}
-              rules={{ required: "Entrance is required" }}
+              rules={{ required: "Route is required" }}
               render={({ field }) => (
                 <Autocomplete
                   options={entrances}
@@ -94,7 +95,7 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="Select Entrance"
+                      label="Select Route"
                       error={!!errors.entranceId}
                       helperText={errors.entranceId?.message}
                     />
@@ -104,7 +105,7 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
             />
           </Grid>
 
-          <Grid item xs={6}>
+          <Grid size={{ xs: 6 }}>
             <Controller
               name="deviceId"
               control={control}
@@ -121,7 +122,7 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
             />
           </Grid>
 
-          <Grid item xs={6}>
+          <Grid size={{ xs: 6 }}>
             <Controller
               name="name"
               control={control}
@@ -138,23 +139,25 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
             />
           </Grid>
 
-          <Grid item xs={6}>
-            <Controller
-              name="streamUrl"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Stream URL"
-                  fullWidth
-                  error={!!errors.streamUrl}
-                  helperText={errors.streamUrl?.message}
-                />
-              )}
-            />
-          </Grid>
+          <Grid size={{ xs: 6 }}>
+          <Controller
+            name="threshold"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Threshold"
+                type="number"
+                fullWidth
+                onChange={(e) => field.onChange(parseInt(e.target.value))}
+                error={!!errors.threshold}
+                helperText={errors.threshold?.message}
+              />
+            )}
+          />
+        </Grid>
 
-          <Grid item xs={6}>
+          <Grid size={{ xs: 6 }}>
             <Controller
               name="ipAddress"
               control={control}
@@ -170,21 +173,37 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
             />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
+            <Controller
+              name="streamUrl"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Stream URL"
+                  fullWidth
+                  error={!!errors.streamUrl}
+                  helperText={errors.streamUrl?.message}
+                />
+              )}
+            />
+          </Grid>
+
+          <Grid size={{ xs: 12 }}>
             <Accordion expanded={roiExpanded} onChange={() => setRoiExpanded(!roiExpanded)}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography>ROI Settings</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
-                  <Grid item xs={6}>
+                  <Grid size={{ xs: 6 }}>
                     <Controller
-                      name="roi.x"
+                      name="roi.L1"
                       control={control}
                       render={({ field }) => (
                         <TextField
                           {...field}
-                          label="X Coordinate"
+                          label="L1 Value"
                           type="number"
                           fullWidth
                           onChange={(e) => field.onChange(parseInt(e.target.value))}
@@ -192,44 +211,14 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
                       )}
                     />
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid size={{ xs: 6 }}>
                     <Controller
-                      name="roi.y"
+                      name="roi.L2"
                       control={control}
                       render={({ field }) => (
                         <TextField
                           {...field}
-                          label="Y Coordinate"
-                          type="number"
-                          fullWidth
-                          onChange={(e) => field.onChange(parseInt(e.target.value))}
-                        />
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Controller
-                      name="roi.width"
-                      control={control}
-                      render={({ field }) => (
-                        <TextField
-                          {...field}
-                          label="Width"
-                          type="number"
-                          fullWidth
-                          onChange={(e) => field.onChange(parseInt(e.target.value))}
-                        />
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Controller
-                      name="roi.height"
-                      control={control}
-                      render={({ field }) => (
-                        <TextField
-                          {...field}
-                          label="Height"
+                          label="L2 Value"
                           type="number"
                           fullWidth
                           onChange={(e) => field.onChange(parseInt(e.target.value))}
@@ -242,14 +231,14 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
             </Accordion>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Accordion expanded={locationExpanded} onChange={() => setLocationExpanded(!locationExpanded)}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography>Location</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
-                  <Grid item xs={6}>
+                  <Grid size={{ xs: 6 }}>
                     <Controller
                       name="location.latitude"
                       control={control}
@@ -264,7 +253,7 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
                       )}
                     />
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid size={{ xs: 6 }}>
                     <Controller
                       name="location.longitude"
                       control={control}
@@ -284,7 +273,7 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
             </Accordion>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Controller
               name="isActive"
               control={control}
@@ -302,6 +291,7 @@ const CameraForm = ({ camera, entrances, handleClose, onSuccess }) => {
             />
           </Grid>
         </Grid>
+
 
         <Box mt={3} display="flex" justifyContent="flex-end">
           <Button onClick={handleClose} sx={{ mr: 2 }}>

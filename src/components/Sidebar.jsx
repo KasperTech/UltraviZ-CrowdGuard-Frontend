@@ -43,7 +43,7 @@ const sidebarData = [
         icon: <Icon icon="solar:camera-bold" width="1.5em" height="1.5em" />,
       },
       {
-        title: "Entrances",
+        title: "Routes",
         url: entranceRoutes.entranceList,
         icon: <Icon icon="solar:home-2-bold" width="1.5em" height="1.5em" />,
       },

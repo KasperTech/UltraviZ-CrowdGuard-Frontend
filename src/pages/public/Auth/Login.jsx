@@ -69,7 +69,7 @@ const Login = () => {
           <Typography variant="h4" fontWeight={600} color="primary">
             Login
           </Typography>
-          <Typography sx={{ mt: -3 }}>Welcome, Keyper Homes Admin!</Typography>
+          <Typography sx={{ mt: -3 }}>UltraviZ CrowdGuard Login!</Typography>
 
           <Controller
             name="email"

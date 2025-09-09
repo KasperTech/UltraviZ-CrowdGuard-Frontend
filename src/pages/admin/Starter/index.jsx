@@ -24,9 +24,9 @@ import brand from "../../../data/brand";
 
 // Meta data
 const meta = {
-  title: "Cameras | HelioWeb Admin",
+  title: "Cameras | KasperTech Admin",
   description: "Manage and monitor all camera devices in your system",
-  keywords: "HelioWeb, Admin, Cameras, Monitoring, Devices",
+  keywords: "KasperTech, Admin, Cameras, Monitoring, Devices",
   robots: "index, follow",
 };
 
@@ -88,12 +88,12 @@ const CameraMapComponent = ({ cameras, center }) => {
   );
 
   return (
-    <APIProvider apiKey={"AIzaSyDb2jWTTiYmPpuYuEnXiCV7XXP8xZl_Klo"}>
+    <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
       <Box sx={{ width: "100%", height: "70vh", borderRadius: 2, overflow: "hidden" }}>
         <Map
           defaultZoom={12}
           defaultCenter={center}
-          mapId={"44f4ad2c8121323e"}
+          mapId={import.meta.env.VITE_GOOGLE_MAPS_ID}
           style={{ height: "100%", width: "100%" }}
         >
           {cameras.map((camera, index) => (
@@ -123,7 +123,7 @@ const CameraMapComponent = ({ cameras, center }) => {
                     component="img"
                     src={brand.icon}
                     alt="Camera"
-                    sx={{ width: 24, height: 24 }}
+                    sx={{ width: 40, height: 40, }}
                   />
                   <StatusSymbol camera={camera} />
                 </Box>

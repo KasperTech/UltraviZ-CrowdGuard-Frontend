@@ -35,10 +35,10 @@ function PieCenterLabel({ children }) {
 
 // Meta data
 const meta = {
-  title: "Dashboard | HelioWeb Admin",
+  title: "Dashboard | KasperTech Admin",
   description:
-    "HelioWeb Admin Dashboard provides an overview of key metrics and charts for sales and statistics.",
-  keywords: "HelioWeb, Admin, Dashboard, Sales, Statistics, Metrics",
+    "KasperTech Admin Dashboard provides an overview of key metrics and charts for sales and statistics.",
+  keywords: "KasperTech, Admin, Dashboard, Sales, Statistics, Metrics",
   robots: "index, follow",
 };
 

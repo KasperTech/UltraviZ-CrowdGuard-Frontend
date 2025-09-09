@@ -1,8 +1,8 @@
 import API from "./axiosConfig";
 
-export const getAlerts = async (page, limit, entranceId, isDeleted, isResolved) => {
+export const getAlerts = async (page, limit, entranceId, isDeleted, isResolved, isRead) => {
     try {
-        const response = await API.get(`/admin/alert?page=${page}&limit=${limit}&entranceId=${entranceId}&isDeleted=${isDeleted}&isResolved=${isResolved}`);
+        const response = await API.get(`/admin/alert?page=${page}&limit=${limit}&entranceId=${entranceId}&isDeleted=${isDeleted}&isResolved=${isResolved}&isRead=${isRead}`);
         return response.data.data;
     } catch (error) {
         console.error("Get cameras failed", error);
@@ -59,3 +59,14 @@ export const restoreAlert = async (id) => {
         throw error;
     }
 };
+
+export const markAlertAsRead = async () => {
+    try {
+        const response = await API.post("/admin/alert/mark-all-as-read");
+        return response.data.data;
+    } catch (error) {
+        console.error("Mark alert as read failed", error);
+        throw error;
+    }
+};
+

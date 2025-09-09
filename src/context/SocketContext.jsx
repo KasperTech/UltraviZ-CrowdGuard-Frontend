@@ -11,10 +11,9 @@ export const useSocket = () => {
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [entranceId, setEntranceId] = useState(null);
-
   useEffect(() => {
     // Initialize socket connection
-    const newSocket = io('http://localhost:5050', {
+    const newSocket = io(import.meta.env.VITE_SOCKET_URL, {
       withCredentials: true,
     });
     
