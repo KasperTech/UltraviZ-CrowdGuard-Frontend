@@ -114,9 +114,9 @@ const CameraMapComponent = ({ cameras, center }) => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    backgroundColor: "white",
+                    // backgroundColor: "white",
                     borderRadius: "50%",
-                    boxShadow: 2,
+                    // boxShadow: 2,
                   }}
                 >
                   <Box

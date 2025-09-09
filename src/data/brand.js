@@ -1,4 +1,4 @@
-import brandIcon from "../assets/UltraviZ.png";
+import brandIcon from "../assets/marker.svg";
 import brandLogo from "../assets/UZ by KT.png";
 
 export default {
