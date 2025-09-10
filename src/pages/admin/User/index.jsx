@@ -71,7 +71,7 @@ const User = () => {
       setLoading(true);
       const statusParam = statusFilter === "all" ? "" : statusFilter === "active";
       const roleParam = roleFilter === "all" ? "" : roleFilter;
-      
+
       const res = await getUsers(
         page + 1,
         limit,
@@ -79,7 +79,7 @@ const User = () => {
         roleParam,
         statusParam
       );
-      
+
       const data = res.data.map((user) => {
         const actions = [
           {
@@ -180,7 +180,7 @@ const User = () => {
   ];
 
   return (
-    <Container maxWidth="xl" sx={{ p: { xs: 2, sm: 4 } }}>
+    <Container maxWidth={1200} sx={{ p: { xs: 2, sm: 4 } }}>
       <Box>
         <Typography variant="h5" fontWeight={600} mb={2}>
           User Management

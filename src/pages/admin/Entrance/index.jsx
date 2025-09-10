@@ -172,7 +172,7 @@ const Entrance = () => {
   ];
 
   return (
-    <Container maxWidth="xl" sx={{ p: { xs: 2, sm: 4 } }}>
+    <Container maxWidth={1200} sx={{ p: { xs: 2, sm: 4 } }}>
       <Box>
         <Typography variant="h5" fontWeight={600} mb={2}>
           Route Management
@@ -241,9 +241,9 @@ const Entrance = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDeleteRestoreModal(false)}>Cancel</Button>
-          <Button 
-            variant="contained" 
-            color={selectedEntrance?.action === 'delete' ? 'error' : 'success'} 
+          <Button
+            variant="contained"
+            color={selectedEntrance?.action === 'delete' ? 'error' : 'success'}
             onClick={handleDeleteRestoreConfirm}
           >
             {selectedEntrance?.action === 'delete' ? 'Delete' : 'Restore'}

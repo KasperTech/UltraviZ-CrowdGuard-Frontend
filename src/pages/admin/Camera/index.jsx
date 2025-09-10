@@ -208,7 +208,7 @@ const Camera = () => {
   ];
 
   return (
-    <Container maxWidth="xl" sx={{ p: { xs: 2, sm: 4 } }}>
+    <Container maxWidth={1200} sx={{ p: { xs: 2, sm: 4 } }}>
       <Box>
         <Typography variant="h5" fontWeight={600} mb={2}>
           Camera Management

@@ -137,6 +137,7 @@ const SidebarSection = ({ section, expandedSections, setExpandedSections }) => {
         fontWeight={600}
         fontSize="1rem"
         lineHeight="1.5"
+        color="secondary"
         sx={{ ml: 0, cursor: "pointer" }}
         onClick={() =>
           setExpandedSections((prev) => ({
@@ -173,6 +174,7 @@ const SidebarNavItem = ({
             {/* Main Nav Item */}
             <ListItem disablePadding sx={{ mb: 1 }}>
               <ListItemButton
+
                 component={item.subItems ? Box : Link}
                 to={item.subItems ? undefined : item.url}
                 onClick={() => {
@@ -194,6 +196,7 @@ const SidebarNavItem = ({
                         ? `rgba(${hexToRgb(theme.palette.primary.main)}, 0.3)`
                         : "lightgrey", // Only change background if not active
                     borderRadius: 2,
+
                   },
                 }}
               >
@@ -202,8 +205,9 @@ const SidebarNavItem = ({
                     mr: -3,
                     color: (theme) =>
                       isActive(item.url) || isSubNavActive(item.subItems)
-                        ? theme.palette.primary.main
-                        : theme.palette.greyNavItem.main,
+                        ? theme.palette.secondary.main
+                        : 'white',
+                    '&:hover': { color: theme => theme.palette.primary.main }
                   }}
                 >
                   {item.icon}
@@ -218,8 +222,14 @@ const SidebarNavItem = ({
                           : 400,
                       color:
                         isActive(item.url) || isSubNavActive(item.subItems)
-                          ? "primary.main"
-                          : "text.secondary",
+                          ? "secondary.main"
+                          : "white",
+                      '&:hover': {
+                        color:
+                          isActive(item.url) || isSubNavActive(item.subItems)
+                            ? "secondary.main"
+                            : "white",
+                      }
                     },
                   }}
                 />
@@ -360,7 +370,7 @@ const Sidebar = ({ drawerWidth, mobileOpen, handleDrawerClose, container }) => {
     <div>
       <Toolbar>
         <Box sx={{ p: 2, py: 4 }}>
-          <Box component="img" src={brand.logo} alt="Logo" width="100%" height="5%"/>
+          <Box component="img" src={brand.logo} alt="Logo" width="100%" height="5%" />
         </Box>
       </Toolbar>
       {sidebarData.map((section) => (
@@ -394,9 +404,10 @@ const Sidebar = ({ drawerWidth, mobileOpen, handleDrawerClose, container }) => {
         <Button
           variant="contained"
           fullWidth
-          sx={{ height: 48, fontSize: "1.5 rem" }}
+          sx={{ height: 48, fontSize: "1.5 rem", color: theme => theme.palette.primary.main, fontWeight: 600 }}
           endIcon={<Icon icon="hugeicons:logout-03" width="1em" height="1em" />}
           onClick={logout}
+          color="secondary"
         >
           Logout
         </Button>
@@ -416,7 +427,8 @@ const Sidebar = ({ drawerWidth, mobileOpen, handleDrawerClose, container }) => {
         }}
         sx={{
           display: { xs: "block", md: "none" },
-          "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
+
+          "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth, },
         }}
       >
         {drawer}
@@ -428,6 +440,7 @@ const Sidebar = ({ drawerWidth, mobileOpen, handleDrawerClose, container }) => {
           "& .MuiDrawer-paper": {
             boxSizing: "border-box",
             width: drawerWidth,
+            background: theme => theme.palette.primary.main,
           },
         }}
         open

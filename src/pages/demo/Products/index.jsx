@@ -165,7 +165,7 @@ const Products = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ p: 4 }}>
+    <Container maxWidth={1200} sx={{ p: 4 }}>
       <Typography variant="h5" fontWeight={600} mb={2}>
         Add Product
       </Typography>
@@ -509,8 +509,8 @@ const Products = () => {
                                   const newSizeValue = e.target.checked
                                     ? [...value, option.value]
                                     : value.filter(
-                                        (size) => size !== option.value
-                                      );
+                                      (size) => size !== option.value
+                                    );
                                   onChange(newSizeValue);
                                 }}
                                 inputProps={{ "aria-label": option.label }}

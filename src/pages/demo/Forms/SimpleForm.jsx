@@ -47,7 +47,7 @@ const SimpleForm = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ p: 4 }}>
+    <Container maxWidth={1200} sx={{ p: 4 }}>
       <Typography variant="h5" fontWeight={600} mb={2}>
         Simple Forms
       </Typography>

@@ -91,7 +91,7 @@ const CameraMapComponent = ({ cameras, center }) => {
     <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
       <Box sx={{ width: "100%", height: "70vh", borderRadius: 2, overflow: "hidden" }}>
         <Map
-          defaultZoom={12}
+          defaultZoom={15}
           defaultCenter={center}
           mapId={import.meta.env.VITE_GOOGLE_MAPS_ID}
           style={{ height: "100%", width: "100%" }}
@@ -130,7 +130,7 @@ const CameraMapComponent = ({ cameras, center }) => {
               </AdvancedMarker>
             )
           ))}
-          
+
           {clickedCamera !== null && cameras[clickedCamera] && (
             <InfoWindow
               position={{
@@ -168,14 +168,14 @@ const Blank = () => {
         setLoading(true);
         const response = await getCameras(1, 500, "", "", "");
         setCameras(response.data || []);
-        
+
         // Calculate online/offline counts
         const online = response.data.filter(camera => camera.isActive).length;
         const offline = response.data.length - online;
-        
+
         setOnlineCount(online);
         setOfflineCount(offline);
-        
+
         // Set map center based on first camera with location data
         const cameraWithLocation = response.data.find(c => c.location?.latitude && c.location?.longitude);
         if (cameraWithLocation) {
@@ -195,14 +195,14 @@ const Blank = () => {
 
   const filteredCameras = cameras.filter(camera => {
     // Filter by search query
-    const matchesSearch = camera.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          camera.deviceId.toLowerCase().includes(searchQuery.toLowerCase());
-    
+    const matchesSearch = camera.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      camera.deviceId.toLowerCase().includes(searchQuery.toLowerCase());
+
     // Filter by status
-    const matchesStatus = statusFilter === "all" || 
-                         (statusFilter === "online" && camera.isActive) ||
-                         (statusFilter === "offline" && !camera.isActive);
-    
+    const matchesStatus = statusFilter === "all" ||
+      (statusFilter === "online" && camera.isActive) ||
+      (statusFilter === "offline" && !camera.isActive);
+
     return matchesSearch && matchesStatus;
   });
 
@@ -225,10 +225,10 @@ const Blank = () => {
       setLoading(true);
       const response = await getCameras(1, 500, "", "", "");
       setCameras(response.data || []);
-      
+
       const online = response.data.filter(camera => camera.isActive).length;
       const offline = response.data.length - online;
-      
+
       setOnlineCount(online);
       setOfflineCount(offline);
     } catch (error) {
@@ -248,12 +248,12 @@ const Blank = () => {
         <meta name="robots" content={meta.robots} />
       </Helmet>
 
-      <Container maxWidth="xl" sx={{ p: 4 }}>
+      <Container maxWidth={1200} sx={{ p: 4 }}>
         <Typography variant="h5" fontWeight={600} mb={2}>
           Camera Management
         </Typography>
         <Breadcrumbs items={breadcrumbItems} />
-        
+
         {/* Stats Cards */}
         <Grid container spacing={3} sx={{ mt: 2, backgroundColor: "secondary" }}>
           <Grid item xs={12} sm={6} md={3}>
@@ -296,7 +296,7 @@ const Blank = () => {
             <Typography variant="h6" fontWeight={600}>
               Camera Locations
             </Typography>
-            
+
             <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
               <TextField
                 label="Search Cameras"
@@ -305,7 +305,7 @@ const Blank = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 sx={{ width: 200 }}
               />
-              
+
               <Badge badgeContent={filterCount} color="secondary">
                 <Tooltip title="Filter">
                   <IconButton onClick={handleFilterClick}>
@@ -313,32 +313,32 @@ const Blank = () => {
                   </IconButton>
                 </Tooltip>
               </Badge>
-              
+
               <Menu
                 anchorEl={filterAnchorEl}
                 open={Boolean(filterAnchorEl)}
                 onClose={handleFilterClose}
               >
-                <MenuItem 
+                <MenuItem
                   onClick={() => handleStatusFilter("all")}
                   selected={statusFilter === "all"}
                 >
                   All Cameras
                 </MenuItem>
-                <MenuItem 
+                <MenuItem
                   onClick={() => handleStatusFilter("online")}
                   selected={statusFilter === "online"}
                 >
                   Online Only
                 </MenuItem>
-                <MenuItem 
+                <MenuItem
                   onClick={() => handleStatusFilter("offline")}
                   selected={statusFilter === "offline"}
                 >
                   Offline Only
                 </MenuItem>
               </Menu>
-              
+
               <Tooltip title="Refresh">
                 <IconButton onClick={refreshData}>
                   <Cached />
@@ -346,7 +346,7 @@ const Blank = () => {
               </Tooltip>
             </Box>
           </Box>
-          
+
           {loading ? (
             <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "400px" }}>
               <Typography>Loading cameras...</Typography>

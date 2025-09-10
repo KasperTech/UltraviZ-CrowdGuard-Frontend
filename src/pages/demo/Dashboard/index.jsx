@@ -104,7 +104,7 @@ const Dashboard = () => {
       </Helmet>
 
       {/* Main Content */}
-      <Container maxWidth="xl" sx={{ p: 4 }}>
+      <Container maxWidth={1200} sx={{ p: 4 }}>
         <Grid container spacing={3}>
           {/* Stats */}
           {stats.map((stat, i) => (

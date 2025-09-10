@@ -205,7 +205,7 @@ const CameraView = () => {
 
   if (loading) {
     return (
-      <Container maxWidth="xl" sx={{ p: { xs: 2, sm: 4 } }}>
+      <Container maxWidth={1200} sx={{ p: { xs: 2, sm: 4 } }}>
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
           <CircularProgress />
         </Box>
@@ -229,9 +229,9 @@ const CameraView = () => {
         </Alert>
       </Snackbar>
 
-      <Box sx={{ mb: 2 }}>
+      {/* <Box sx={{ mb: 2 }}>
         <Breadcrumbs items={breadcrumbItems} />
-      </Box>
+      </Box> */}
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4" fontWeight={600}>
@@ -393,7 +393,7 @@ const CameraView = () => {
                     {rate < 0 ? (
                       <Typography variant="body2" color="textSecondary" gutterBottom>Crowd under control</Typography>
                     ) : (
-                      <Typography variant="body2" color="body1" gutterBottom>Time to stampede: {currentMean ? (
+                      <Typography variant="body2" color="body1" gutterBottom>Time to stampede: {(currentMean / camera.threshold) > 0.7 ? (
                         `${((camera.threshold - currentMean) / rate).toFixed(2)} min`
                       ) : ("No data")}</Typography>
                     )}
